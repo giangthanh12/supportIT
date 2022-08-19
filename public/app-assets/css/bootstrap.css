@@ -53,7 +53,7 @@
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.45;
-  --bs-body-color: #6e6b7b;
+  --bs-body-color: #333;
   --bs-body-bg: #f8f8f8; }
 
 *,
@@ -71,7 +71,7 @@ body {
   font-size: var(--bs-body-font-size);
   font-weight: var(--bs-body-font-weight);
   line-height: var(--bs-body-line-height);
-  color: var(--bs-body-color);
+  color: var(--bs-body-color) !important;
   text-align: var(--bs-body-text-align);
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
@@ -93,7 +93,7 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
   font-family: inherit;
   font-weight: 500;
   line-height: 1.2;
-  color: #5e5873; }
+  color: #333; }
 
 h1, .h1 {
   font-size: calc(1.325rem + 0.9vw); }
@@ -1484,7 +1484,7 @@ progress {
   --bs-table-hover-bg: #f6f6f9;
   width: 100%;
   margin-bottom: 1rem;
-  color: #6e6b7b;
+  color: #333;
   vertical-align: middle;
   border-color: #ebe9f1; }
 
@@ -2350,7 +2350,7 @@ textarea.form-control-lg {
   display: inline-block;
   font-weight: 400;
   line-height: 1;
-  color: #6e6b7b;
+  color: #333;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
@@ -3108,7 +3108,7 @@ fieldset:disabled .btn {
   padding: 0.65rem 1.28rem;
   clear: both;
   font-weight: 400;
-  color: #6e6b7b;
+  color: #333;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;

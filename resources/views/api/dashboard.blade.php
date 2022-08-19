@@ -92,7 +92,7 @@
                                 <div class="row pb-50">
                                     <div class="col-sm-6 col-12 d-flex justify-content-between flex-column order-sm-1 order-2 mt-1 mt-sm-0">
                                         <div class="mb-1 mb-sm-0">
-                                            <h4 class="card-title">Danh sách yêu cầu đang xử lý</h4>
+                                            <h4 class="card-title">Danh sách yêu cầu</h4>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-12 d-flex justify-content-between flex-column text-end order-sm-2 order-1">
@@ -172,6 +172,13 @@
 }
 .hiddenRow {
         padding: 0 !important;
+    }
+    .statistic-ticket-user a {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+        line-height: 40px;
+        color:#fff !important;
     }
 </style>
 @php

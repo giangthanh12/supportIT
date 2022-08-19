@@ -36,15 +36,31 @@ class DashboardController extends Controller
         $data = [];
         $auth_id = '"'.Auth::id().'"';
         $groups_id = Group::where("members_id", "like",'%'.$auth_id.'%')->pluck("id");
-        $total_assign_tickets = Ticket::where("status", 2)->whereIn('group_id', $groups_id)->get()->count();
         // via support
-        $total_new_tickets = Ticket::whereIn('group_id', $groups_id)->where("status", 1)->get()->count();
-        $total_tickets_done = Ticket::whereIn('group_id', $groups_id)->whereIn("status", [3,4])->get()->count();
-        $total_tickets_notdone = Ticket::whereIn('group_id', $groups_id)->where("status", 2)->get()->count();
+        $total_assign_tickets = 0;
+        $total_new_tickets = 0;
+        $total_tickets_done = 0;
+        $total_tickets_notdone = 0;
+        if(count($groups_id) > 0) {
+            $total_assign_tickets = Ticket::where("status", 2)->whereIn('group_id', $groups_id)->get()->count();
+            $total_new_tickets = Ticket::where("status", 1)->whereIn('group_id', $groups_id)->get()->count();
+            $total_tickets_done = Ticket::whereIn("status", [3,4])->whereIn('group_id', $groups_id)->get()->count();
+            $total_tickets_notdone = Ticket::where("status", 2)->whereIn('group_id', $groups_id)->get()->count();
+        }
           // via user
-          $total_new_tickets_user = Ticket::query()->where("status", 1)->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get()->count();
-          $total_tickets_done_user = Ticket::whereIn("status", [3,4])->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get()->count();
-          $total_tickets_notdone_user = Ticket::where("status", 2)->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get()->count();
+          $total_new_tickets_user = Ticket::where(function ($query) {
+            $query->where("creator_id", Auth::id())
+                  ->orWhere("cc",Auth::id());
+        })
+        ->where("status", 1)->get()->count();
+        $total_tickets_done_user = Ticket::where(function ($query) {
+            $query->where("creator_id", Auth::id())
+                  ->orWhere("cc",Auth::id());
+        })->whereIn("status", [3,4])->get()->count();
+        $total_tickets_notdone_user = Ticket::where(function ($query) {
+            $query->where("creator_id", Auth::id())
+                  ->orWhere("cc",Auth::id());
+        })->where("status", 2)->get()->count();
         $data["total_assign_tickets"] = $total_assign_tickets;
         $data["total_new_tickets"] = $total_new_tickets;
         $data["total_tickets_done"] = $total_tickets_done;

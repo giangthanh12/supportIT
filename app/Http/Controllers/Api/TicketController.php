@@ -149,8 +149,10 @@ class TicketController extends Controller
         ->when($request->has("group_id") && $request->group_id != "", function ($query) use($request) {
             return $query->where("group_id", $request->group_id);
         })
-        ->where("creator_id", Auth::id())
-        ->orWhere("cc", Auth::id())
+        ->where(function ($query) {
+            $query->where("creator_id", Auth::id())
+                  ->orWhere("cc",Auth::id());
+        })
         ->orderBy("status", "ASC")
         ->orderBy("level", "ASC")
         ->orderBy("created_at", "DESC")->get();

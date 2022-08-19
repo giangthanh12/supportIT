@@ -126,8 +126,10 @@ class TicketController extends Controller
     // get ticket by creator
     public function getdata(Request $request) {
         $tickets = Ticket::with("user:id,name,avatar")->select("id", "title", "level","status","creator_id","created_at")
-        ->where("creator_id", Auth::id())
-        ->orWhere("cc", Auth::id())
+        ->where(function ($query) {
+            $query->where("creator_id", Auth::id())
+                  ->orWhere("cc",Auth::id());
+        })
         ->when($request->has("level") && $request->level != "", function ($query) use($request) {
             return $query->where("level", $request->level);
         })
