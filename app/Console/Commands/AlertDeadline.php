@@ -41,18 +41,18 @@ class AlertDeadline extends Command
      */
     public function handle()
     {
-        $tickets = Ticket::where("status",3)->get();
+        $tickets = Ticket::whereIn("status",[1,2])->get();
         if(!empty($tickets)) {
            $notifyBitrix24 = new NotifyBitrix24();
            try {
                foreach ($tickets as $ticket) {
-                if (in_array($ticket->status, [1,2])) {
-                       if(strtotime(Carbon::now()) >= strtotime(Carbon::parse($ticket->deadline)) && !is_null($ticket->confirm_deadline)) {
-                           // sendnotify
-                           $ticket->confirm_deadline = $ticket->deadline;
+                       if(strtotime(Carbon::now()) >= strtotime(Carbon::parse($ticket->deadline)) && is_null($ticket->confirm_deadline)) {
+                        info("Trạng thái yêu cầu da thay đổi alert 2");
+                          // sendnotify
+                           $ticket->confirm_deadline = Carbon::now();
                            $ticket->save();
                            $attribute = [
-                               "message"=>"Yêu cầu đã hết hạn. Hãy hoàn thành sớm yêu cầu trên sớm nhất có thể.",
+                               "message"=>"Yêu cầu đã hết hạn. Hãy hoàn thành sớm yêu cầu sớm nhất có thể.",
                                "title"=>"Yêu cầu: ".$ticket->title,
                                "group_name"=>$ticket->group->group_name,
                                "deadline"=>$ticket->deadline,
@@ -70,9 +70,8 @@ class AlertDeadline extends Command
                            info("Đã cập nhật trạng thái đóng yêu cầu");
                        }
                        //bắn notify hệ thống tự động đóng yêu cầu
-                   }
                }
-               info("Trạng thái yêu cầu không thay đổi");
+               info("Trạng thái yêu cầu không thay đổi alert");
            } catch (\Throwable $th) {
                info($th);
            }

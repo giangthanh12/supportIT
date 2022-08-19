@@ -27,6 +27,7 @@ class Ticket extends Model
         'level',
         'status',
         'deadline',
+        'confirm_deadline'
     ];
     public function getCreatedAtAttribute($value) {
         return Carbon::createFromTimestamp(strtotime($value))

@@ -73,9 +73,18 @@ Route::get("test", function() {
 Route::get("/statistic/getData", [StatisticController::class, "getData"]);
 
 Route::get("/test-notify", function() {
-            $total_new_tickets_user = Ticket::query()->where("status", 1)->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get();
-            dd($total_new_tickets_user);
-    // $a = Ticket::find(41)->deadline;
+   $a = Ticket::find(41);
+//    dd(!is_null($a->confirm_deadline));
+//    if(strtotime(Carbon::now()) > strtotime(Carbon::parse($a->deadline)) && is_null($a->confirm_deadline)) {
+//     return "ok" ;
+//    }
+   if (in_array($a->status, [1,2])) {
+    $a->confirm_deadline = Carbon::parse($a->deadline)->format("Y-m-d H:i:s");
+    $a->save();
+}
+            // $total_new_tickets_user = Ticket::query()->where("status", 1)->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get();
+            // dd($total_new_tickets_user);
+
     // return strtotime(Carbon::now()) - strtotime(Carbon::parse($a));
     // $result = CRest::call('im.notify.system.add', Array(
     //     'USER_ID' => 945,
@@ -161,7 +170,7 @@ Route::get("/test-notify", function() {
 // 'SUB_TAG' => 'SUB|TEST',
 // 'ATTACH' => ''
 //      )
-Helper::notifySystem(945, "Hệ thống đã tự động đóng yêu cầu.", "Yêu cầu: Sửa mạng cho cơ sở 6", "Nhóm hỗ trợ IT", "18.08.2022 21:40");
+// Helper::notifySystem(945, "Hệ thống đã tự động đóng yêu cầu.", "Yêu cầu: Sửa mạng cho cơ sở 6", "Nhóm hỗ trợ IT", "18.08.2022 21:40");
 });
 
 Route::get("get-statistic-staff/{id_group}", [DashboardController::class, "get_statistic_staff"])->name("ticket.get-statistic-staff");

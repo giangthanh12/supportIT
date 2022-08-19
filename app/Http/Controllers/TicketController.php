@@ -234,6 +234,9 @@ class TicketController extends Controller
             Storage::disk("public")->putFileAs("assets/file-ticket", $request->file('ticket_file'), $file);
             $file_path = "storage/assets/file-ticket/".$file;
         }
+        if(strtotime($request->input("ticket-deadline")) > strtotime($ticket->deadline)) {
+            $ticket->confirm_deadline = NULL;
+        }
             $ticket->title=$request->input("ticket-title");
             $ticket->creator_id=Auth::id();
             $ticket->deadline = Carbon::parse($request->input("ticket-deadline"))->format("Y-m-d H:i");
