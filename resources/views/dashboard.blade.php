@@ -51,7 +51,7 @@
                                 <div class="card-body statistic-ticket-user">
                                     <div class="row">
                                         <div class="col-sm-12 col-12 d-flex flex-column flex-wrap ">
-                                            <h3 class="fw-bolder card-text">Hỗ trợ</h3>
+                                            <h3 class="fw-bolder card-text">Yêu cầu được giao</h3>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between mt-1 mb-1">
@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12 col-12 d-flex flex-column flex-wrap ">
-                                            <h3 class="fw-bolder card-text">Người dùng</h3>
+                                            <h3 class="fw-bolder card-text">Yêu cầu của bạn</h3>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between mt-1">

@@ -9,7 +9,7 @@
                 <div class="sidebar-content todo-sidebar">
                     <div class="todo-app-menu">
                         <div class="add-task">
-                            <h4>Assign Tickets</h4>
+                            <h4>Yêu cầu được giao</h4>
                             <button type="button" class="btn btn-primary w-100 d-none" data-bs-toggle="modal" >
                                 Giao việc
                             </button>
@@ -72,7 +72,7 @@
                                         <option data-icon="fas fa-exclamation" value="1">Đang chờ xử lý</option>
                                         <option data-icon="fas fa-divide" value="2">Đang xử lý</option>
                                         <option data-icon="fas fa-check" value="3">Đã xử lý</option>
-                                        <option data-icon="fas fa-lock" value="4">Đã đóng yêu cầu</option>
+                                        <option data-icon="fas fa-lock" value="4">Đã đóng</option>
                                     </select>
                                 </div>
                                 <div>

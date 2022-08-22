@@ -29,7 +29,7 @@
                                     <span style="width:30px;display: inline-block;text-align: center;">
                                         <i  class="fas fa-lock"></i>
                                     </span>
-                                     <span class="align-middle">Đóng tác vụ</span>
+                                     <span class="align-middle">Đã đóng</span>
                                 </a>
                             </div>
                             <div class="mt-3 px-2 d-flex justify-content-between">
@@ -209,6 +209,7 @@
     var status = "<?php echo $status; ?>";
 
     var emails_json = <?php echo json_encode(config('app.super_emails')); ?>;
+    console.log(emails_json);
 </script>
 <script src="../../../app-assets/lib/libApi.js"></script>
 <script src="../../../app-assets/js/scripts/pages/app-todo-api.js"></script>

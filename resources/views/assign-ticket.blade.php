@@ -61,7 +61,7 @@
                                         <option data-icon="fas fa-exclamation" value="1">Đang chờ xử lý</option>
                                         <option data-icon="fas fa-divide" value="2">Đang xử lý</option>
                                         <option data-icon="fas fa-check" value="3">Đã xử lý</option>
-                                        <option data-icon="fas fa-lock" value="4">Đã đóng yêu cầu</option>
+                                        <option data-icon="fas fa-lock" value="4">Đã đóng</option>
                                     </select>
                                 </div>
                                 <div>

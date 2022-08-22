@@ -16,6 +16,11 @@ $(function () {
             localStorage.setItem("token", token);
         }
     }
+    // if($("#item-settings").hasClass("d-none") && $("#item-groups").hasClass("d-none")) {
+    //     alert("ok");
+    //     $("#item-settings").removeClass("d-none");
+    //     $("#item-groups").removeClass("d-none");
+    // }
     // get info user
     $.ajax({
         type: "GET",
@@ -36,13 +41,9 @@ $(function () {
           $(".user-name").html(userCurrent.name);
           if(userCurrent.avatar != null)
           $(".avatar-header img").attr("src", userCurrent.avatar);
-          if(emails_json.indexOf(userCurrent.email) != -1)
-          {
-            $(".item-settings").removeClass("d-none");
-            $(".item-groups").removeClass("d-none");
-          }
         }
     });
+
 });
 
 function notifyMe(receiverid, senderid, title, avatar, content, type) { // notify khi co thong bao moi

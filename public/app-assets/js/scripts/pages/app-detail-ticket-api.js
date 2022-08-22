@@ -11,6 +11,11 @@
 
 
 $(function () {
+    if(emails_json.includes(localStorage.getItem("auth_email")))
+          {
+            $("#item-settings a").removeClass("d-none");
+            $("#item-groups a").removeClass("d-none");
+          }
     var taskTitle,
     flatPickr = $('.task-due-date'),
     newTaskModal = $('#add-ticket-modal'),

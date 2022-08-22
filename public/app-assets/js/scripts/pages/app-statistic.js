@@ -101,9 +101,7 @@ $(function () {
               var $row_output =
                 '<div style="text-align:left;" class="d-flex justify-content-left align-items-center">' +
                 '<div class="d-flex flex-column">' +
-                '<a href="' +
-                userView +
-                '" class="user_name text-truncate text-body"><span class="fw-bolder">' +
+                '<a href="#" style="cursor:default;" class="user_name text-truncate text-body"><span class="fw-bolder">' +
                 full["group_name"] +
                 '</span></a>' +
                 '<a href="'+$email+'"><small class="emp_post text-muted">' +

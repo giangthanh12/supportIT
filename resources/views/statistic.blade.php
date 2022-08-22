@@ -21,7 +21,7 @@
                             <div class="card-body d-flex align-items-center justify-content-between">
                                 <div>
                                     <h3 class="fw-bolder mb-75">{{$total}}</h3>
-                                    <span>Tổng</span>
+                                    <span>Tổng yêu cầu</span>
                                 </div>
                                 <div class="avatar bg-light-primary p-50">
                                     <span class="avatar-content">
@@ -36,7 +36,7 @@
                             <div class="card-body d-flex align-items-center justify-content-between">
                                 <div>
                                     <h3 class="fw-bolder mb-75">{{$totalDone}}</h3>
-                                    <span>Chưa hoàn thành</span>
+                                    <span>Yêu cầu chưa hoàn thành</span>
                                 </div>
                                 <div class="avatar bg-light-danger p-50">
                                     <span class="avatar-content">
@@ -51,7 +51,7 @@
                             <div class="card-body d-flex align-items-center justify-content-between">
                                 <div>
                                     <h3 class="fw-bolder mb-75">{{$totalNotDone}}</h3>
-                                    <span>Đã hoàn thành</span>
+                                    <span>Yêu cầu đã hoàn thành</span>
                                 </div>
                                 <div class="avatar bg-light-success p-50">
                                     <span class="avatar-content">

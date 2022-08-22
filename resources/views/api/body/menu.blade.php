@@ -26,9 +26,9 @@
                 </li>
                 <li class="nav-item" ><a class="nav-link d-flex align-items-center" href="{{route("api.statistic")}}" ><i data-feather="layers"></i><span data-i18n="User Interface">Thống kê</span></a>
                 </li>
-                <li class="nav-item item-settings d-none" data-menu=""><a class="nav-link d-flex align-items-center" href="{{route("api.settings")}}" ><i data-feather="package"></i><span data-i18n="Apps">Cài đặt</span></a>
+                <li class="nav-item" id="item-settings"><a class="d-none nav-link d-flex align-items-center" href="{{route("api.settings")}}" ><i data-feather="package"></i><span data-i18n="Apps">Cài đặt</span></a>
                 </li>
-                <li class="nav-item item-groups d-none" data-menu=""><a class="nav-link d-flex align-items-center" href="{{route("api.group")}}" ><i data-feather="package"></i><span data-i18n="Apps">Nhóm</span></a>
+                <li class="nav-item" id="item-groups"><a class="d-none nav-link d-flex align-items-center" href="{{route("api.group")}}" ><i data-feather="package"></i><span data-i18n="Apps">Nhóm</span></a>
                 </li>
             </ul>
         </div>

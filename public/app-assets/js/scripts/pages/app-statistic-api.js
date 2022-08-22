@@ -8,6 +8,7 @@
 
 ==========================================================================================*/
 $(function () {
+
     ('use strict');
     var dtUserTable = $('.user-list-table'),
       newUserSidebar = $('.new-user-modal'),
@@ -107,9 +108,7 @@ $(function () {
               var $row_output =
                 '<div style="text-align:left;" class="d-flex justify-content-left align-items-center">' +
                 '<div class="d-flex flex-column">' +
-                '<a href="' +
-                userView +
-                '" class="user_name text-truncate text-body"><span class="fw-bolder">' +
+                '<a href="#" style="cursor:default;" class="user_name text-truncate text-body"><span class="fw-bolder">' +
                 full["group_name"] +
                 '</span></a>' +
                 '<a href="'+$email+'"><small class="emp_post text-muted">' +
@@ -203,6 +202,11 @@ $(function () {
           }
         },
       });
+    }
+    if(emails_json.includes(localStorage.getItem("auth_email")))
+    {
+      $("#item-settings a").removeClass("d-none");
+      $("#item-groups a").removeClass("d-none");
     }
     $("#month-holiday").change(function(e) {
         const val = $(this).val();
