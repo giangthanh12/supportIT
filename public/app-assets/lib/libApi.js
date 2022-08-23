@@ -12,6 +12,7 @@ function getParameterByName(name, url) { // lay tham so qua URL
 }
 var userCurrent = {};
 $(function () {
+    alert("ok1");
     if(typeof token !== 'undefined') {
         if(token.length > 0) {
             localStorage.setItem("token", token);
@@ -36,11 +37,12 @@ $(function () {
               $(".user-name").html(userCurrent.name);
               if(userCurrent.avatar != null)
               $(".avatar-header img").attr("src", userCurrent.avatar);
+              if(emails_json.includes(localStorage.getItem("auth_email")) || emails_json.includes(userCurrent.email)) {
+                $("#item-settings").attr('style', 'display: inline-block !important');
+                $("#item-groups").attr('style', 'display: inline-block !important');
+       }
             }
         });
-
-
-
 });
 
 function notifyMe(receiverid, senderid, title, avatar, content, type) { // notify khi co thong bao moi

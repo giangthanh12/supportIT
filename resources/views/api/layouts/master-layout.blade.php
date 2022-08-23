@@ -152,12 +152,14 @@
     </script>
     @endif
     <script>
+
          var emails_json = <?php echo json_encode(config('app.super_emails')); ?>;
         $(window).on('load', function() {
-            if(emails_json.includes(localStorage.getItem("auth_email"))) {
-                     $("#item-settings").attr('style', 'display: inline-block !important');
-                     $("#item-groups").attr('style', 'display: inline-block !important');
-            }
+            alert(emails_json.includes(localStorage.getItem("auth_email")));
+            // if(emails_json.includes(localStorage.getItem("auth_email"))) {
+            //          $("#item-settings").attr('style', 'display: inline-block !important');
+            //          $("#item-groups").attr('style', 'display: inline-block !important');
+            // }
             if (window.location.href.indexOf("api/my-ticket") == -1) {
                 $(".button-create-ticket").removeClass("d-none");
             }

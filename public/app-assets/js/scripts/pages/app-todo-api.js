@@ -270,7 +270,6 @@ $(function () {
                 }
             }
             });
-            console.log(dateDeadline);
         }
 
 
@@ -316,7 +315,7 @@ $(function () {
           },
           dropdownParent: $('#cc').parent(),
       });
-
+      $("#ticket-deadline").val("").change();
       $("#group_id").val("").change();
       $("#ticket-level").val("").change();
       $('#ticket-title').val("");
