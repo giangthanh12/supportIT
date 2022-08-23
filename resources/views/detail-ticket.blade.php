@@ -247,6 +247,7 @@
     var detailTicket = <?php echo json_encode($ticket); ?>;
     console.log(detailTicket);
 </script>
+<script src="../../../app-assets/helpers/create-ticket.js"></script>
 <script src="../../../app-assets/js/scripts/pages/app-detail-ticket.js"></script>
 @endpush
 

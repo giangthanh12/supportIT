@@ -58,9 +58,9 @@
                             <div class="dropdown" style="display: flex; align-items: center; gap: 10px;">
                                 <div style="min-width: 270px;">
                                     <select class="select2 form-select" style="max-width:400px;" id="status-ticket" name="status-ticket" >
-                                        <option data-icon="fas fa-exclamation" value="1">Đang chờ xử lý</option>
-                                        <option data-icon="fas fa-divide" value="2">Đang xử lý</option>
-                                        <option data-icon="fas fa-check" value="3">Đã xử lý</option>
+                                        <option data-icon="fas fa-exclamation text-primary" value="1">Đang chờ xử lý</option>
+                                        <option data-icon="fas fa-divide text-warning" value="2">Đang xử lý</option>
+                                        <option data-icon="fas fa-check text-success" value="3">Đã xử lý</option>
                                         <option data-icon="fas fa-lock" value="4">Đã đóng</option>
                                     </select>
                                 </div>
@@ -145,5 +145,6 @@
     var idAuth = "<?php echo auth()->user()->id; ?>";
     var status = "<?php echo $status; ?>";
 </script>
+<script src="../../../app-assets/helpers/create-ticket.js"></script>
 <script src="../../../app-assets/js/scripts/pages/assign-ticket.js"></script>
 @endpush

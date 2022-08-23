@@ -202,5 +202,6 @@
     }
 </style>
 @push('js')
+    <script src="../../../app-assets/helpers/create-ticket.js"></script>
     <script src="../../../app-assets/js/scripts/charts/chart-chartjs.js"></script>
 @endpush

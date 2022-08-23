@@ -214,6 +214,7 @@
     var emails_json = <?php echo json_encode(config('app.super_emails')); ?>;
 </script>
         <!-- BEGIN: Page JS-->
+        <script src="../../../app-assets/helpers/create-ticket-api.js"></script>
         <script src="../../../app-assets/lib/libApi.js"></script>
         <script src="../../../app-assets/js/scripts/pages/app-statistic-api.js"></script>
         <!-- END: Page JS-->

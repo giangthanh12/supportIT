@@ -77,6 +77,11 @@
     <!-- BEGIN: Footer-->
     @include("api.body.footer")
     <!-- END: Footer-->
+
+    {{-- Modal center --}}
+        @include("api.body.modal-create")
+    {{-- end modal center --}}
+
     <style>
     .horizontal-menu .header-navbar.navbar-horizontal .nav-link.dropdown-toggle::after {
         background-image: none;
@@ -103,7 +108,7 @@
     <script src="../../../app-assets/vendors/js/extensions/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="../../../app-assets/vendors/js/extensions/sweetalert2.all.min.js"></script>
-    <script src="../../../app-assets/lib/lib.js"></script>
+    {{-- <script src="../../../app-assets/lib/lib.js"></script> --}}
       <!-- BEGIN: Page Vendor JS-->
       <script src="../../../app-assets/vendors/js/ui/jquery.sticky.js"></script>
       <script src="../../../app-assets/vendors/js/charts/chart.min.js"></script>
@@ -142,10 +147,20 @@
             rtl: false
             });
         @endif
+
+
     </script>
     @endif
     <script>
+         var emails_json = <?php echo json_encode(config('app.super_emails')); ?>;
         $(window).on('load', function() {
+            if(emails_json.includes(localStorage.getItem("auth_email"))) {
+                     $("#item-settings").attr('style', 'display: inline-block !important');
+                     $("#item-groups").attr('style', 'display: inline-block !important');
+            }
+            if (window.location.href.indexOf("api/my-ticket") == -1) {
+                $(".button-create-ticket").removeClass("d-none");
+            }
             if (feather) {
                 feather.replace({
                     width: 14,

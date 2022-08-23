@@ -33,7 +33,9 @@
                 <li class=" nav-item" data-menu=""><a class="nav-link d-flex align-items-center" href="{{route("ticket.group")}}" ><i data-feather="package"></i><span data-i18n="Apps">Nhóm</span></a>
                 </li>
                 @endif
+                <li style="margin-left: auto;" class="nav-item float-left button-create-ticket d-none"><a class="nav-link d-flex align-items-center" href="#" ><i data-feather='plus-circle'></i><span data-i18n="Apps">Tạo yêu cầu</span></a></li>
             </ul>
+
         </div>
     </div>
 </div>

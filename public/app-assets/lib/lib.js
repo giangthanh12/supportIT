@@ -1,5 +1,8 @@
 var isRtl = $('html').attr('data-textdirection') === 'rtl';
 
+if (window.location.href.indexOf("my-ticket") == -1) {
+    $(".button-create-ticket").removeClass("d-none");
+}
 function getParameterByName(name, url) { // lay tham so qua URL
     if (!url)
         url = window.location.href;
@@ -24,6 +27,8 @@ $(function () {
     else {
         return true;
     }
+
+
     // kiem tra connection websocket khi dong tab
     // window.addEventListener("beforeunload", function (e) {
     //       $.ajax({

@@ -16,13 +16,13 @@
                         <div class="sidebar-menu-list">
                             <div class="list-group list-group-filters">
                                 <a href="#" data-status_ticket = "1" class="list-group-item list-group-item-action">
-                                    <span style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-exclamation"></i> </span><span class="align-middle">Đang chờ xử lý</span>
+                                    <span class=" " style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-exclamation text-primary"></i> </span><span class="align-middle">Đang chờ xử lý</span>
                                 </a>
                                 <a href="#" data-status_ticket = "2" class="list-group-item list-group-item-action">
-                                    <span style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-divide"></i></span><span class="align-middle">Đang xử lý</span>
+                                    <span style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-divide text-warning"></i></span><span class="align-middle">Đang xử lý</span>
                                 </a>
                                 <a href="#" data-status_ticket = "3" class="list-group-item list-group-item-action">
-                                        <span style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-check" ></i></span>
+                                        <span style="width:30px;display: inline-block;text-align: center;"><i class="fas fa-check text-success" ></i></span>
                                         <span class="align-middle">Đã xử lý</span>
                                 </a>
                                 <a href="#" data-status_ticket = "4" class="list-group-item list-group-item-action">

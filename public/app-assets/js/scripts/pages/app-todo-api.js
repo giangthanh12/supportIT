@@ -12,12 +12,6 @@
 
 
 $(function () {
-
-    if(emails_json.includes(localStorage.getItem("auth_email")))
-          {
-            $("#item-settings a").removeClass("d-none");
-            $("#item-groups a").removeClass("d-none");
-          }
   var taskTitle,
     level="",
     // status="",
@@ -90,14 +84,7 @@ $(function () {
       $(this).addClass('active');
     });
   }
-  // set calendar
-  if ($(".flatpickr-basic").length) {
-    $(".flatpickr-basic").flatpickr({
-        enableTime: true,
-        minDate:"today",
-        dateFormat: "d-m-Y H:i",
-        });
-    }
+
   //filter level
   if ($(".list-group-labels").length) {
     $(".list-group-labels").find('a').on('click', function () {
@@ -128,7 +115,7 @@ $(function () {
 
   //notify when delete ticket
     if(localStorage.getItem("msg") != null) {
-        toastr['success'](localStorage.getItem("msg"), 'Error', {
+        toastr['success'](localStorage.getItem("msg"), 'Success', {
             tapToDismiss: false,
             progressBar: true,
             rtl: false
@@ -247,6 +234,46 @@ $(function () {
   // On add new item button click, clear sidebar-right field fields
   if (addTaskBtn.length) {
     addTaskBtn.on('click', function (e) {
+          // set calendar
+    if ($(".flatpickr-basic").length) {
+        var dateDefault = new Date();
+        var dateStr =
+          ("00" + dateDefault.getDate()).slice(-2) + "-" +
+          ("00" + (dateDefault.getMonth() + 1)).slice(-2) + "-" +
+          dateDefault.getFullYear() + " " +
+          ("00" + (dateDefault.getHours()+1)).slice(-2) + ":00";
+        let dateDeadline = $(".flatpickr-basic").flatpickr({
+            enableTime: true,
+            minDate:"today",
+            time_24hr: true,
+            dateFormat:"d-m-Y H:i",
+            defaultDate: dateStr,
+            minTime:("00" + (dateDefault.getHours()+1)).slice(-2),
+            locale: {
+                firstDayOfWeek: 1
+            },
+            onChange: function (selectedDates, dateStr, instance) {
+                var selectedDates = new Date(selectedDates);
+                var dateCurrent = new Date();
+                var currentMonth = dateCurrent.getMonth();
+                var selectedMonth = selectedDates.getMonth();
+                var currentDate = dateCurrent.getDate();
+                var selectedDate = selectedDates.getDate();
+                var currentYear = dateCurrent.getFullYear();
+                var selectedYear = selectedDates.getFullYear();
+                if(currentMonth == selectedMonth && currentDate == selectedDate && currentYear == selectedYear) {
+                    var mintime = dateCurrent.getHours() ;
+                    instance.set("minTime", mintime+1+":00");
+                }
+                else {
+                    instance.set("minTime","00:00");
+                }
+            }
+            });
+            console.log(dateDeadline);
+        }
+
+
         var validator = $("#form-modal-ticket").validate(); // reset form
         validator.resetForm();
         $(".error").removeClass("error"); // loại bỏ validate
@@ -518,9 +545,9 @@ function get_list_ticket(level,status,time,group_id_filter) {
     const level_label = ["Gấp", "Quan trọng", "Bình thường"];
     const colorClass = ["danger", "warning", "info"];
     const icon_label = [
-        `<i class="fas fa-exclamation"></i>`,
-        `<i class="fas fa-divide"></i>`,
-        `<i class="fas fa-check" ></i>`,
+        `<i class="fas fa-exclamation text-primary"></i>`,
+        `<i class="fas fa-divide text-warning"></i>`,
+        `<i class="fas fa-check text-success" ></i>`,
         `<i  class="fas fa-lock"></i>`
     ];
     $.ajax({

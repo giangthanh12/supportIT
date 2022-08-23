@@ -72,6 +72,7 @@ Route::get("/ticket/get-assignee-by-group/{group_id}", [TicketController::class,
 Route::get("/ticket/get-assignee-by-ticket/{ticket_id}", [TicketController::class, "getAssigneeByTicket"])->name("api.getAssigneeByTicket");
 Route::get("/ticket/get-ticket-incomplete", [TicketController::class, "get_ticket_incomplete"])->name("api.get-ticket-incomplete");
 Route::middleware("auth:api")->post("/ticket/save", [TicketController::class, "save"])->name("api.save");
+Route::middleware("auth:api")->post("/ticket/save-shortcut", [TicketController::class, "save_shortcut"])->name("api.save-shortcut");
 Route::middleware("auth:api")->get("/ticket/getdata", [TicketController::class, "getdata"])->name("api.getdata");
 Route::middleware("auth:api")->get('/ticket/getAssignTicket',[TicketController::class, "getdata_assign_ticket"]);
 Route::get("/ticket/detail/{id}", [TicketController::class, "detail"])->name("api.detail");

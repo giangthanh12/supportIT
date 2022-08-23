@@ -267,6 +267,7 @@
 @push('js')
     <!-- BEGIN: Page JS-->
     <script src="../../../app-assets/js/scripts/pages/app-user-list.js"></script>
+    <script src="../../../app-assets/helpers/create-ticket.js"></script>
     <!-- END: Page JS-->
     <script>
         $(document).ready(function() {

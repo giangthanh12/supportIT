@@ -9,11 +9,6 @@
 
 $(window).on('load', function () {
   'use strict';
-  if(emails_json.includes(localStorage.getItem("auth_email")))
-          {
-            $("#item-settings a").removeClass("d-none");
-            $("#item-groups a").removeClass("d-none");
-          }
   var chartWrapper = $('.chartjs'),
     flatPicker = $('.flat-picker'),
     barChartEx = $('.bar-chart-ex'),

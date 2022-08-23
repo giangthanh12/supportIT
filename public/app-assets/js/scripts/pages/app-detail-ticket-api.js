@@ -11,11 +11,6 @@
 
 
 $(function () {
-    if(emails_json.includes(localStorage.getItem("auth_email")))
-          {
-            $("#item-settings a").removeClass("d-none");
-            $("#item-groups a").removeClass("d-none");
-          }
     var taskTitle,
     flatPickr = $('.task-due-date'),
     newTaskModal = $('#add-ticket-modal'),
@@ -332,19 +327,6 @@ $(function () {
     });
   }
 
-  // Flat Picker
-  if (flatPickr.length) {
-    flatPickr.flatpickr({
-      dateFormat: 'Y-m-d',
-      defaultDate: 'today',
-      onReady: function (selectedDates, dateStr, instance) {
-        if (instance.isMobile) {
-          $(instance.mobileInput).attr('step', null);
-        }
-      }
-    });
-  }
-
   // Todo Description Editor
   if (taskDesc.length) {
     var todoDescEditor = new Quill('#task-desc', {
@@ -378,7 +360,7 @@ $(function () {
 //   }
 
 // detail ticket
-      newTaskModal.modal('show');
+
       sidebarLeft.removeClass('show');
       overlay.removeClass('show');
       newTaskModal.find('.new-todo-item-title').val('');
@@ -426,7 +408,30 @@ $(function () {
         $(".flatpickr-basic").flatpickr({
             enableTime: true,
             dateFormat: "d-m-Y H:i",
+            time_24hr: true,
             defaultDate:dateDefault,
+            locale: {
+                firstDayOfWeek: 1
+            },
+            onChange: function (selectedDates, dateStr, instance) {
+                var selectedDates = new Date(selectedDates);
+                var dateCurrent = new Date();
+                var currentMonth = dateCurrent.getMonth();
+                var selectedMonth = selectedDates.getMonth();
+                var currentDate = dateCurrent.getDate();
+                var selectedDate = selectedDates.getDate();
+                var currentYear = dateCurrent.getFullYear();
+                var selectedYear = selectedDates.getFullYear();
+                console.log(instance);
+                if(currentMonth == selectedMonth && currentDate == selectedDate && currentYear == selectedYear) {
+                    var mintime = dateCurrent.getHours() ;
+
+                    instance.set("minTime", ("00" + (mintime+1)).slice(-2));
+                }
+                else {
+                    instance.set("minTime","00:00");
+                }
+            },
             enable: [
                 {
                     from: "today",
@@ -437,7 +442,9 @@ $(function () {
                     to:  `${dateEnable} 23:59`
                 },
 
-            ]
+            ],
+
+
             });
         }
 

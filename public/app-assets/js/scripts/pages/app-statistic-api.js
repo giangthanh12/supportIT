@@ -203,11 +203,6 @@ $(function () {
         },
       });
     }
-    if(emails_json.includes(localStorage.getItem("auth_email")))
-    {
-      $("#item-settings a").removeClass("d-none");
-      $("#item-groups a").removeClass("d-none");
-    }
     $("#month-holiday").change(function(e) {
         const val = $(this).val();
         if(val.length > 0) {

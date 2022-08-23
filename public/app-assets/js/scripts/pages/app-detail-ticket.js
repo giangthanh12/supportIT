@@ -10,7 +10,6 @@
 'use strict';
 
 $(function () {
-console.log(detailTicket.cc);
     var taskTitle,
     flatPickr = $('.task-due-date'),
     newTaskModal = $('#add-ticket-modal'),

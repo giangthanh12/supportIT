@@ -524,9 +524,9 @@ function get_list_ticket(level,status,time) {
     const level_label = ["Gấp", "Quan trọng", "Bình thường"];
     const colorClass = ["danger", "warning", "info"];
     const icon_label = [
-        `<i class="fas fa-exclamation"></i>`,
-        `<i class="fas fa-divide"></i>`,
-        `<i class="fas fa-check" ></i>`,
+        `<i class="fas fa-exclamation text-primary"></i>`,
+        `<i class="fas fa-divide text-warning"></i>`,
+        `<i class="fas fa-check text-success" ></i>`,
         `<i  class="fas fa-lock"></i>`
     ];
     $.ajax({

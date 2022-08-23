@@ -1,4 +1,5 @@
 var isRtl = $('html').attr('data-textdirection') === 'rtl';
+
 function getParameterByName(name, url) { // lay tham so qua URL
     if (!url)
         url = window.location.href;
@@ -16,33 +17,29 @@ $(function () {
             localStorage.setItem("token", token);
         }
     }
-    // if($("#item-settings").hasClass("d-none") && $("#item-groups").hasClass("d-none")) {
-    //     alert("ok");
-    //     $("#item-settings").removeClass("d-none");
-    //     $("#item-groups").removeClass("d-none");
-    // }
     // get info user
-    $.ajax({
-        type: "GET",
-        url: "/api/get-user",
-        contentType: 'application/json',
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('Authorization', 'Bearer '+ localStorage.getItem("token"));
-            xhr.setRequestHeader('Accept', 'application/json');
-        },
-        dataType: "json",
-        success: function (response) {
-          userCurrent = response;
-          console.log(userCurrent);
-          localStorage.setItem("auth_name", userCurrent.name);
-          localStorage.setItem("auth_id", userCurrent.id);
-          localStorage.setItem("auth_email", userCurrent.email);
-          localStorage.setItem("auth_avatar", userCurrent.avatar);
-          $(".user-name").html(userCurrent.name);
-          if(userCurrent.avatar != null)
-          $(".avatar-header img").attr("src", userCurrent.avatar);
-        }
-    });
+        $.ajax({
+            type: "GET",
+            url: "/api/get-user",
+            contentType: 'application/json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer '+ localStorage.getItem("token"));
+                xhr.setRequestHeader('Accept', 'application/json');
+            },
+            dataType: "json",
+            success: function (response) {
+              userCurrent = response;
+              localStorage.setItem("auth_name", userCurrent.name);
+              localStorage.setItem("auth_id", userCurrent.id);
+              localStorage.setItem("auth_email", userCurrent.email);
+              localStorage.setItem("auth_avatar", userCurrent.avatar);
+              $(".user-name").html(userCurrent.name);
+              if(userCurrent.avatar != null)
+              $(".avatar-header img").attr("src", userCurrent.avatar);
+            }
+        });
+
+
 
 });
 

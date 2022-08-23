@@ -77,6 +77,12 @@
     <!-- BEGIN: Footer-->
     @include("body.footer")
     <!-- END: Footer-->
+
+    {{-- Modal center --}}
+        @include("body.modal-create")
+    {{-- end modal center --}}
+
+
     <style>
     .horizontal-menu .header-navbar.navbar-horizontal .nav-link.dropdown-toggle::after {
         background-image: none;

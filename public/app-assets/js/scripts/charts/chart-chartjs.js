@@ -37,7 +37,6 @@ $(window).on('load', function () {
     lineChartDanger = '#ff4961',
     labelColor = '#6e6b7b',
     grid_line_color = 'rgba(200, 200, 200, 0.2)'; // RGBA color helps in dark layout
-
   // Detect Dark Layout
   if ($('html').hasClass('dark-layout')) {
     labelColor = '#b4b7bd';
@@ -60,6 +59,7 @@ $(window).on('load', function () {
       });
     });
   }
+
 
 //   $("#btn_screen").click(function() {
 //     console.log(barChartExample.data.labels.shift());
@@ -142,6 +142,8 @@ $(window).on('load', function () {
       }
     });
   }
+
+
 
   // ajax call data
   $.ajax({
