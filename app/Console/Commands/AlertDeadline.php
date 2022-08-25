@@ -53,7 +53,7 @@ class AlertDeadline extends Command
                            $ticket->save();
                            $attribute = [
                                "message"=>"Yêu cầu đã hết hạn. Hãy hoàn thành sớm yêu cầu sớm nhất có thể.",
-                               "title"=>"Yêu cầu: ".$ticket->title,
+                               "title"=>$ticket->title,
                                "group_name"=>$ticket->group->group_name,
                                "deadline"=>$ticket->deadline,
                            ];

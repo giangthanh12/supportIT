@@ -155,7 +155,7 @@
 
          var emails_json = <?php echo json_encode(config('app.super_emails')); ?>;
         $(window).on('load', function() {
-            alert(emails_json.includes(localStorage.getItem("auth_email")));
+            // alert(emails_json.includes(localStorage.getItem("auth_email")));
             // if(emails_json.includes(localStorage.getItem("auth_email"))) {
             //          $("#item-settings").attr('style', 'display: inline-block !important');
             //          $("#item-groups").attr('style', 'display: inline-block !important');

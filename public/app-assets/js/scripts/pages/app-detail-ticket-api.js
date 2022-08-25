@@ -425,11 +425,17 @@ $(function () {
                 console.log(instance);
                 if(currentMonth == selectedMonth && currentDate == selectedDate && currentYear == selectedYear) {
                     var mintime = dateCurrent.getHours() ;
-
-                    instance.set("minTime", ("00" + (mintime+1)).slice(-2));
+                    if(mintime == 23) {
+                        instance.set("minTime", ("00" + (mintime)).slice(-2)+":"+("00" + (dateCurrent.getMinutes())).slice(-2));
+                        console.log(("00" + (mintime)).slice(-2)+":"+("00" + (dateCurrent.getMinutes())).slice(-2))
+                    } else {
+                        instance.set("minTime", ("00" + (mintime+1)).slice(-2)+":00");
+                        console.log(("00" + (mintime+1)).slice(-2)+":00")
+                    }
                 }
                 else {
                     instance.set("minTime","00:00");
+                    console.log("oke2");
                 }
             },
             enable: [

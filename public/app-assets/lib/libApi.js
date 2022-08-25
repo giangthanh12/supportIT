@@ -12,7 +12,6 @@ function getParameterByName(name, url) { // lay tham so qua URL
 }
 var userCurrent = {};
 $(function () {
-    alert("ok1");
     if(typeof token !== 'undefined') {
         if(token.length > 0) {
             localStorage.setItem("token", token);
