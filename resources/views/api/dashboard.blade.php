@@ -18,7 +18,7 @@
                         <div class="card">
                             <div class="card-body text-center">
 
-                                <div class="avatar avatar-xl bg-primary shadow">
+                                <div class="avatar avatar-xl bg-info shadow">
                                     <div class="avatar-content">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-award font-large-1"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
                                     </div>
@@ -49,7 +49,7 @@
                                 <div class="d-flex justify-content-between mt-1 mb-1">
                                     <div class="text-center">
                                         <p class="card-text mb-50 fw-bold">Đang chờ xử lý</p>
-                                        <a href="{{route("api.assign-ticket")}}?status=1" class="badge bg-info font-large-1 fw-bold total_new_tickets" title="yêu cầu"></a>
+                                        <a href="{{route("api.assign-ticket")}}?status=1" class="badge bg-primary font-large-1 fw-bold total_new_tickets" title="yêu cầu"></a>
                                     </div>
                                     <div class="text-center">
                                         <p class="card-text mb-50 fw-bold">Đang xử lý</p>
@@ -68,7 +68,7 @@
                                 <div class="d-flex justify-content-between mt-1">
                                     <div class="text-center">
                                         <p class="card-text mb-50 fw-bold">Đang chờ xử lý</p>
-                                        <a href="{{route("api.my-ticket")}}?status=1" class="badge bg-info font-large-1 fw-bold total_new_tickets_user" title="yêu cầu"></a>
+                                        <a href="{{route("api.my-ticket")}}?status=1" class="badge bg-primary font-large-1 fw-bold total_new_tickets_user" title="yêu cầu"></a>
                                     </div>
                                     <div class="text-center">
                                         <p class="card-text mb-50 fw-bold">Đang xử lý</p>

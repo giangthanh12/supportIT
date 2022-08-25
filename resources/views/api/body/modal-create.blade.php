@@ -71,7 +71,7 @@
                                     <input id="ticket_file_shortcut" name="ticket_file_shortcut" type="file" class="form-control"  />
                                 </div>
                                 <div class="col-12 d-flex flex-sm-row flex-column mt-2">
-                                    <button type="submit"  class="btn btn-primary mb-1 mb-sm-0 mr-1 mr-sm-1" style="margin-right: 8px;" id="btnUpdateShortcut">Cập nhật</button>
+                                    <button type="submit"  class="btn btn-primary mb-1 mb-sm-0 mr-1 mr-sm-1" style="margin-right: 8px;" id="btnUpdateShortcut">Thêm mới</button>
                                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                                         Đóng
                                     </button>

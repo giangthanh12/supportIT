@@ -548,4 +548,61 @@ class TicketController extends Controller
             'msg'=>"Đã xóa comment thành công",
         ],Response::HTTP_OK);
     }
+    public function save_shortcut(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'name_creator_shortcut'=>'required',
+            'email_creator_shortcut'=>'required',
+            'group_id_shortcut'=>'required',
+            'ticket-level_shortcut'=>'required',
+            'ticket-title_shortcut'=>'required',
+            'content_shortcut'=>'required',
+            "ticket-deadline_shortcut"=>"required"
+        ]);
+        if($validator->fails()) {
+            return response()->json([
+                'errors'=>"Đã xảy ra lỗi validate trong quá trình tạo yêu cầu"
+            ],Response::HTTP_BAD_REQUEST);
+        }
+        $file_path = null;
+        if(!is_null($request->file('ticket_file_shortcut'))) {
+            $file = pathinfo($request->file('ticket_file_shortcut')->getClientOriginalName(), PATHINFO_FILENAME).rand(0,10).'.'.$request->file('ticket_file_shortcut')->getClientOriginalExtension();
+            Storage::disk("public")->putFileAs("assets/file-ticket", $request->file('ticket_file_shortcut'), $file);
+            $file_path = "storage/assets/file-ticket/".$file;
+        }
+        $ticket = Ticket::create([
+            "title"=>$request->input("ticket-title_shortcut"),
+            "creator_id"=>Auth::id(),
+            "name_creator"=>$request->name_creator_shortcut,
+            "deadline"=>Carbon::parse($request->input("ticket-deadline_shortcut"))->format("Y-m-d H:i"),
+            "cc"=>!is_null($request->input("cc_shortcut")) ? $request->input("cc_shortcut") : NULL,
+            "email_creator"=>$request->email_creator_shortcut,
+            "group_id"=>$request->group_id_shortcut,
+            "file"=>$file_path,
+            "assignees_id"=>is_null($request->input("task-assigned_shortcut")) ? NULL : json_encode($request->input("task-assigned_shortcut")),
+            "content"=>$request->content_shortcut,
+            "level"=>$request->input("ticket-level_shortcut"),
+        ]);
+            // update history
+            $this->addHistory($ticket->id, "Tạo yêu cầu");
+            $attribute = [
+                "message"=>auth()->user()->name." vừa tạo mới một yêu cầu [b]$ticket->title[/b]",
+                "group_name"=>$ticket->group->group_name,
+                "deadline"=>Carbon::parse($ticket->deadline)->format("d.m.Y H:i")
+            ];
+            if(!is_null($ticket->cc) && !empty($ticket->cc) && auth()->user()->id != $ticket->cc) {
+                (new NotifyBitrix24())->sendOneMember($ticket,auth()->user()->storeToken,$request->input("cc_shortcut"),$attribute);
+            }
+        // notify tất cả các thành viên trong nhóm có yêu cầu mới
+        (new NotifyBitrix24())->sendAllMembers($ticket,auth()->user()->storeToken, $attribute);
+        if(!Helper::checkTime(Carbon::parse($request->input('ticket-deadline_shortcut')))) {
+            return response()->json([
+                "status"=>"warning",
+                'msg'=>"Lịch deadline không nằm trong lịch làm việc nhân viên. Vui lòng chỉnh sửa lại deadline cho phù hợp!"
+            ],Response::HTTP_CREATED);
+        }
+        return response()->json([
+            "status"=>"success",
+            'msg'=>"Đã tạo yêu cầu thành công"
+        ],Response::HTTP_CREATED);
+    }
 }

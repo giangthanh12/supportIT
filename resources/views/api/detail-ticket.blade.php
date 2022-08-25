@@ -8,15 +8,15 @@
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Chi tiết yêu cầu</h2>
-                            <div class="breadcrumb-wrapper">
+                            <h2 class="content-header-title float-start mb-0" style="border-right:none !important;">Chi tiết yêu cầu</h2>
+                            {{-- <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="index.html">Trang chủ</a>
                                     </li>
                                     <li class="breadcrumb-item active">Chi tiết yêu cầu
                                     </li>
                                 </ol>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
@@ -172,15 +172,12 @@
                                                     <button type="submit"
                                                         class="btn btn-primary mb-1 mb-sm-0 mr-1 mr-sm-1 d-none"
                                                         style="margin-right: 8px;" id="btnUpdate">Cập nhật</button>
-                                                    {{-- <button onclick="handleDeleleTicket({{ $ticket->id }})"
-                                                        type="button" id="btnDelete"
-                                                        class="btn btn-danger waves-effect waves-float waves-light d-none"
-                                                        style="margin-right: 8px;">Xóa</button> --}}
                                                         <button onclick="handleSuccess({{$ticket->id}})" type="button" id="btnSuccess" class="btn btn-outline-success  waves-effect waves-float waves-light d-none" style="margin-right: 8px;">Duyệt</button>
                                                         <button type="button" onclick="handleSwitchStatus(event, {{$ticket->id}})" data-status_ticket="{{$ticket->status == 4 ? 2 : 4}}"  class="btn btn-success mb-1 mb-sm-0 mr-1 mr-sm-1 d-none"  style="margin-right: 8px;" id="switch-status-ticket">Đóng yêu cầu</button>
                                                         <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
                                                         Quay lại
                                                     </a>
+                                                    <a onclick="handleDeleleTicket({{$ticket->id}})" type="button" id="btnDelete" class="btn btn-danger waves-effect waves-float waves-light d-none" style="margin-left:auto;padding: 10px;"><i data-feather='trash-2'></i></a>
                                                 </div>
                                             </div>
                                         </form>

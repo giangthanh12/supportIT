@@ -205,6 +205,7 @@ Route::get("/ticket/get-assignee-by-group/{group_id}", [TicketController::class,
 Route::get("/ticket/get-assignee-by-ticket/{ticket_id}", [TicketController::class, "getAssigneeByTicket"])->name("ticket.getAssigneeByTicket");
 Route::get("/ticket/get-ticket-incomplete", [TicketController::class, "get_ticket_incomplete"])->name("ticket.get-ticket-incomplete");
 Route::post("/ticket/save", [TicketController::class, "save"])->name("ticket.save");
+Route::post("/ticket/save-shortcut", [TicketController::class, "save_shortcut"])->name("ticket.save-shortcut");
 Route::post("/ticket/confirm-ticket", [TicketController::class, "confirm_ticket"])->name("ticket.confirm-ticket");
 Route::get("/ticket/getdata", [TicketController::class, "getdata"])->name("ticket.getdata");
 Route::get('/ticket/getAssignTicket',[TicketController::class, "getdata_assign_ticket"]);

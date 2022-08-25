@@ -20,17 +20,46 @@ $(window).on('load', function () {
             return_combobox_multi_custom("#task-assigned_shortcut", "/api/ticket/get-assignee-by-group/"+group_id, "");
         }
     });
-        // set calendar
-        if ($(".flatpickr-basic").length) {
-            $(".flatpickr-basic").flatpickr({
-                enableTime: true,
-                minDate:"today",
-                dateFormat: "d-m-Y H:i",
-                });
-            }
     //add ticket
     if ($(".button-create-ticket a").length) {
         $(".button-create-ticket a").on('click', function (e) {
+            // set calendar
+            if ($(".flatpickr-basic").length) {
+                var dateDefault = new Date();
+                var dateStr =
+                ("00" + dateDefault.getDate()).slice(-2) + "-" +
+                ("00" + (dateDefault.getMonth() + 1)).slice(-2) + "-" +
+                dateDefault.getFullYear() + " " +
+                ("00" + (dateDefault.getHours()+1)).slice(-2) + ":00";
+                let dateDeadline = $(".flatpickr-basic").flatpickr({
+                    enableTime: true,
+                    minDate:"today",
+                    time_24hr: true,
+                    dateFormat:"d-m-Y H:i",
+                    defaultDate: dateStr,
+                    minTime:("00" + (dateDefault.getHours()+1)).slice(-2),
+                    locale: {
+                        firstDayOfWeek: 1
+                    },
+                    onChange: function (selectedDates, dateStr, instance) {
+                        var selectedDates = new Date(selectedDates);
+                        var dateCurrent = new Date();
+                        var currentMonth = dateCurrent.getMonth();
+                        var selectedMonth = selectedDates.getMonth();
+                        var currentDate = dateCurrent.getDate();
+                        var selectedDate = selectedDates.getDate();
+                        var currentYear = dateCurrent.getFullYear();
+                        var selectedYear = selectedDates.getFullYear();
+                        if(currentMonth == selectedMonth && currentDate == selectedDate && currentYear == selectedYear) {
+                            var mintime = dateCurrent.getHours() ;
+                            instance.set("minTime", mintime+1+":00");
+                        }
+                        else {
+                            instance.set("minTime","00:00");
+                        }
+                    }
+                    });
+                }
             e.preventDefault();
             var validator = $("#form-modal-ticket-shortcut").validate(); // reset form
             validator.resetForm();
