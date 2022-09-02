@@ -9,6 +9,7 @@
 ==========================================================================================*/
 var url = "";
 $(function () {
+    alert("ok5");
     if(emails_json.includes(localStorage.getItem("auth_email")))
     {
       $("#item-settings a").removeClass("d-none");
@@ -303,6 +304,12 @@ $('#memberIds').select2({
         'group-name': {
           required: true
         },
+        'leaderId': {
+            required: true
+          },
+        'memberIds': {
+        required: true
+        },
       }
     });
 
@@ -341,18 +348,21 @@ $('#memberIds').select2({
             success:function(response){
               newUserSidebar.modal('hide');
               $(".user-list-table").DataTable().ajax.reload(null, false);
-              toastr['success'](response.msg, '🎉 Success', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-                });
+              notyfi_success(response.msg);
             },
             error: function(error) {
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
             });
       }
@@ -442,11 +452,12 @@ function loaddata(id) {
             url ="/api/group/update/"+id;
         },
         error: function () {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-             });
+            if(error.responseJSON.status == 400) {
+                notify_error(error.msg);
+            }
+            else {
+                notify_error("Lỗi server");
+            }
         },
     });
 }
@@ -475,18 +486,15 @@ function del(id) {
                 dataType: "json",
                 success: function (response) {
                     $(".user-list-table").DataTable().ajax.reload(null, false);
-                    toastr['success'](response.msg, '🎉 Success', {
-                      tapToDismiss: false,
-                      progressBar: true,
-                      rtl: false
-                      });
+                    notyfi_success(response.msg);
                 },
                 error: function (error) {
-                    toastr['error'](error.responseJSON.errors, 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                     });
+                    if(error.responseJSON.status == 400) {
+                        notify_error(error.msg);
+                    }
+                    else {
+                        notify_error("Lỗi server");
+                    }
                 },
             });
         }

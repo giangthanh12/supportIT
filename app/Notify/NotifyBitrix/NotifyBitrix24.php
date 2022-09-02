@@ -48,7 +48,7 @@ class NotifyBitrix24
     }
 
     public function sendMembers($ticket, $storeToken, $assignees, $attribute) {
-        $group_members = json_decode($assignees);
+        $group_members = json_decode($assignees, true);
         if(!is_null($group_members) && !empty($group_members)) {
             try {
                 foreach($group_members as $id_member) {

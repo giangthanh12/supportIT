@@ -197,6 +197,7 @@ function notify_error(msg_Text) {
     toastr['error'](msg_Text, 'Báo lỗi !', {
         closeButton: true,
         tapToDismiss: false,
+        timeOut: 5000,
         rtl: isRtl
     });
 }
@@ -208,7 +209,14 @@ function notyfi_success(msg_Text) {
         rtl: isRtl
     });
 }
-
+function notyfi_warning(msg_Text) {
+    toastr['warning'](msg_Text, 'Cảnh báo!', {
+        closeButton: true,
+        tapToDismiss: false,
+        timeOut: 10000,
+        rtl: isRtl
+    });
+}
 function logout() {
     $.ajax({
         url: baseHome + '/auth/logout',  //server script to process data

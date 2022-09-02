@@ -222,14 +222,9 @@ $(function () {
               } else {
                 $this.addClass('active');
               }
-              notyfi_success("Cập nhật trạng thái comment thành công");
         },
         error: function(error) {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-             });
+            notify_error("Lỗi server!");
         },
     });
   });
@@ -265,11 +260,7 @@ $(function () {
                     notyfi_success("Cập nhật comment thành công");
                 },
                 error: function(error) {
-                    toastr['error']("Không được bỏ trống!", 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                    });
+                    notify_error("Không được bỏ trống!");
                 },
             });
             }
@@ -301,11 +292,7 @@ $(function () {
             notyfi_success("Xóa comment thành công");
         },
         error: function(error) {
-            toastr['error']("Xóa comment không thành công!", 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-            });
+            notify_error("Xóa comment không thành công!");
         },
     });
   });
@@ -576,7 +563,11 @@ $.ajax({
             contentType: false,
             processData: false,
             success: function (data) {
-                notyfi_success(data.msg);
+                if(data.status == "success") {
+                    notyfi_success(data.msg)
+                 } else {
+                    notyfi_warning(data.msg)
+                 }
                 if(data.data.file != null) {
                     $('#ticket_file_old').val(data.data.file);
                     $("#link-file-ticket").html(`<a target="_blank" href="/${data.data.file}" style="text-decoration: underline;"><i style="color:#7367f0;" data-feather='arrow-right'></i>Link download tại đây</a>`)
@@ -584,11 +575,20 @@ $.ajax({
                 getHistories();
             },
             error: function(error) {
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else if(error.status == 401) {
+                    notify_error(error.msg);
+                  }
+                  else
+                  notify_error("Lỗi server");
             },
         });
         return false;
@@ -624,7 +624,6 @@ $.ajax({
             processData: false,
             success: function (data) {
                 $("#list-comments").find('.background-comment')?.remove();
-                notyfi_success(data.msg);
                 let htmlResponse =
                 `<div class="comment mb-3">
                     <div class="d-flex flex-start align-items-center">`;
@@ -659,11 +658,7 @@ $.ajax({
                 $("#list-comments").scrollTop($("#list-comments")[0].scrollHeight);
             },
             error: function(error) {
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                notify_error("Lỗi server");
             },
         });
         return false;
@@ -715,11 +710,7 @@ function handleSuccess(ticket_id) {
             window.location.replace("/api/assign-ticket");
         },
         error: function(error) {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-            });
+            notify_error("Lỗi server");
         },
     });
 }
@@ -739,11 +730,7 @@ function handleSwitchStatus(event,ticket_id) {
             window.location.replace("/api/my-ticket");
         },
         error: function(error) {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-            });
+            notify_error("Lỗi server");
         },
     });
 }
@@ -776,11 +763,7 @@ function handleDeleleTicket(ticket_id) {
                     window.location.replace("/my-ticket");
                 },
                 error: function(error) {
-                    toastr['error'](error.responseJSON.errors, 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                    });
+                    notify_error("Lỗi server");
                 },
             });
         }
@@ -805,11 +788,7 @@ function getHistories() {
               });
         },
         error: function(error) {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-            });
+            notify_error("Lỗi server");
         },
     });
 }

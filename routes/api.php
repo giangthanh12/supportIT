@@ -42,7 +42,7 @@ Route::middleware('auth:api')->post("/group/save", [GroupController::class, "sav
 Route::middleware('auth:api')->get("/group/detail/{id}", [GroupController::class, "detail"])->name("api.group-detail");
 Route::middleware('auth:api')->post("/group/update/{id}", [GroupController::class, "update"])->name("api.group-update");
 Route::middleware('auth:api')->delete("/group/delete/{id}", [GroupController::class, "delete"])->name("api.group-delete");
-Route::get("/ticket/get-user-availble", [GroupController::class, "getUserAvailble"])->name("ticket.get-user-availble");
+Route::get("/ticket/get-user-availble", [GroupController::class, "getUserAvailble"])->name("api.get-user-availble");
 Route::middleware('auth:api')->get("/get-statistic-staff/{id_group}", [DashboardController::class, "get_statistic_staff"])->name("api.get-statistic-staff");
 //statistic
 Route::get("/statistic", [StatisticController::class, "index"])->name("api.statistic");
@@ -60,7 +60,7 @@ Route::middleware("auth:api")->post("/settings/holiday/save", [ConfigController:
 Route::middleware("auth:api")->get("/settings/holiday/detail/{id}", [ConfigController::class, "detailHoliday"])->name("api.holiday-edit");
 Route::middleware("auth:api")->post("/settings/update-holiday/{id}", [ConfigController::class, "updateHoliday"])->name("api.holiday-update");
 Route::middleware("auth:api")->delete("/settings/holiday/delete/{id}", [ConfigController::class, "deleteHoliday"])->name("api.holiday-delete");
-Route::middleware("auth:api")->delete("/settings/calendar/delete/{id}", [ConfigController::class, "deleteCalendar"])->name("api.holiday-delete");
+Route::middleware("auth:api")->delete("/settings/calendar/delete/{id}", [ConfigController::class, "deleteCalendar"]);
 // ticket and comment
 Route::get('/my-ticket', [TicketController::class, "get_my_ticket"])->name("api.my-ticket");
 Route::get('/assign-ticket',[TicketController::class, "get_assign_ticket"])->name("api.assign-ticket");

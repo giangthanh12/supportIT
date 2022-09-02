@@ -229,7 +229,7 @@ if ($(".date-group").length) {
     $("#dropdownItem5").html(value);
     $.ajax({
         type: "GET",
-        url: "/get-ticketNotDone?date="+date,
+        url: "/get-ticketNotDone?time="+date,
         dataType: "json",
         success: function (response) {
             let htmlResponse = "";

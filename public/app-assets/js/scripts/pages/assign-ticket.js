@@ -312,15 +312,7 @@ $(function () {
   if (newTaskForm.length) {
     newTaskForm.validate({
       rules: {
-        todoTitleAdd: {
-          required: true
-        },
-        'task-assigned': {
-          required: true
-        },
-        'task-due-date': {
-          required: true
-        }
+
       }
     });
 
@@ -345,11 +337,19 @@ $(function () {
                 newTaskModal.modal('hide');
             },
             error: function(error) {
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                console.log(error.responseJSON.errors);
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
         });
         return false;
@@ -432,11 +432,18 @@ $(function () {
                 newTaskModal.modal('hide');
             },
             error: function(error) {
-                toastr['error']("Có lỗi trong quá trình giao việc", 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
         });
         return false;

@@ -114,14 +114,23 @@ $(function () {
   }
 
   //notify when delete ticket
-    if(localStorage.getItem("msg") != null) {
+  if(localStorage.getItem("msg") != null) {
+    if(localStorage.getItem("status") != null) {
+        toastr[localStorage.getItem("status")](localStorage.getItem("msg"), localStorage.getItem("status"), {
+            tapToDismiss: false,
+            progressBar: true,
+            rtl: false
+         });
+         localStorage.removeItem("status");
+    } else {
         toastr['success'](localStorage.getItem("msg"), 'Success', {
             tapToDismiss: false,
             progressBar: true,
             rtl: false
          });
-        localStorage.removeItem("msg");
     }
+    localStorage.removeItem("msg");
+}
 
   // Main menu toggle should hide app menu
   if (menuToggle.length) {
@@ -382,26 +391,26 @@ $(function () {
             },
             success: function (data) {
                 if(data.status == "success") {
-                    notyfi_success(data.msg);
-                }
-                else {
-                    toastr['warning'](data.msg, 'Warning', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        timeOut: 10000,
-                        rtl: false
-                     });
-                }
+                    notyfi_success(data.msg)
+                 } else {
+                    notyfi_warning(data.msg)
+                 }
                 get_list_ticket(level,status,time,group_id_filter);
                 newTaskModal.modal('hide');
             },
             error: function(error) {
-                console.log(error);
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
         });
         return false;

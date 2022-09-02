@@ -54,18 +54,18 @@ Route::get("chart", function() {
 });
 
 Route::get("test", function() {
-    $data = Group::select("id","group_name","leader_id")->with("user:id,name")->withCount([
-        'ticket as total' => function ($query) {
-            $query->whereIn('status', [1,2,3,4]);
-        },
-        'ticket as totalDone' => function ($query) {
-            $query->whereIn('status', [3,4]);
-        },
-        'ticket as totalNotDone' => function ($query) {
-            $query->whereIn('status', [1,2]);
-        }
-    ])->get();
-    return $data;
+    // $data = Group::select("id","group_name","leader_id")->with("user:id,name")->withCount([
+    //     'ticket as total' => function ($query) {
+    //         $query->whereIn('status', [1,2,3,4]);
+    //     },
+    //     'ticket as totalDone' => function ($query) {
+    //         $query->whereIn('status', [3,4]);
+    //     },
+    //     'ticket as totalNotDone' => function ($query) {
+    //         $query->whereIn('status', [1,2]);
+    //     }
+    // ])->get();
+    // return $data;
     // $data = Group::select("id", "group_name")->with("ticket:id,group_id")->get(); // muon lay truong cu the phai co khoa ngoai de hieu
 });
 
@@ -74,103 +74,10 @@ Route::get("/statistic/getData", [StatisticController::class, "getData"]);
 
 Route::get("/test-notify", function() {
    $a = Ticket::find(41);
-//    dd(!is_null($a->confirm_deadline));
-//    if(strtotime(Carbon::now()) > strtotime(Carbon::parse($a->deadline)) && is_null($a->confirm_deadline)) {
-//     return "ok" ;
-//    }
    if (in_array($a->status, [1,2])) {
     $a->confirm_deadline = Carbon::parse($a->deadline)->format("Y-m-d H:i:s");
     $a->save();
 }
-            // $total_new_tickets_user = Ticket::query()->where("status", 1)->where("creator_id", Auth::id())->orWhere("cc",Auth::id())->get();
-            // dd($total_new_tickets_user);
-
-    // return strtotime(Carbon::now()) - strtotime(Carbon::parse($a));
-    // $result = CRest::call('im.notify.system.add', Array(
-    //     'USER_ID' => 945,
-    //     'MESSAGE' => 'Hệ thống đã tự động đóng yêu cầu.',
-    //     "ATTACH" => Array(
-    //         "ID" => 1,
-    //         "COLOR" => "#29619b",
-    //         "BLOCKS" => Array(
-    //            Array("LINK" => Array(
-    //               "NAME" => "Yêu cầu: Sửa ống nước",
-    //               "DESC" => "",
-    //               "LINK" => "https://b24-0ozis8.bitrix24.vn/marketplace/app/1/"
-    //            )),
-    //         )
-    //     )
-    //  ));
-    // bắn notify
-    // $storeToken = auth()->user()->storeToken;
-    // $infoToken = [
-    //     "access_token"=>$storeToken->access_token,
-    //     "domain"=>$storeToken->domain,
-    //     "refresh_token"=>$storeToken->refresh_token,
-    //     "application_token"=>$storeToken->application_token,
-    // ];
-    // $data = array();
-    // $userCallback= CRest::call('user.get',[ "id"=>[1,945]]);
-
-        // foreach($userCallback["result"] as $userBitrix) {
-        //     $data[] = ["id"=>$userBitrix["ID"], "email"=>$userBitrix["EMAIL"]];
-        // }
-    // dd($userCallback);
-
-        // $userCallback= CRest::call(
-        // 'user.get',
-        // array(
-        //     "to"=>945,
-        //     "message"=> "Xin chào Nguyễn Thanh Giang",
-        //     "ATTACH" => Array(
-        //         "ID" => 1,
-        //         "COLOR" => "#29619b",
-        //         "BLOCKS" => Array(
-        //            Array("LINK" => Array(
-        //               "NAME" => "Yêu cầu: Sửa mạng cho cơ sở 6",
-        //               "DESC" => "Cần làm trước khi về",
-        //               "LINK" => "https://admin.sconnect.edu.vn/marketplace/app/7/"
-        //            )),
-        //         )
-        //     )
-        // ), $infoToken);
-
-    // $userCallback= CRest::call(
-    //     'im.notify',
-    //     array(
-    //         "to"=>945,
-    //         "message"=> "Nguyễn Thanh Giang vừa thích yêu cầu của bạn",
-    //         "ATTACH" => Array(
-    //             "ID" => 1,
-    //             "COLOR" => "#29619b",
-    //             "BLOCKS" => Array(
-    //                Array("LINK" => Array(
-    //                   "NAME" => "Yêu cầu: Sửa mạng cho cơ sở 6",
-    //                   "LINK" => "https://admin.sconnect.edu.vn/marketplace/app/7/",
-    //                   "DISPLAY" => "LINE"
-    //                )),
-    //                Array("GRID" => Array(
-    //                 [],[]
-    //              )),
-    //             ))), $infoToken);
-
-// Array(
-//     "NAME" => "Assigned to",
-//     "VALUE" => "Evgeniy Shelenkov",
-//     "DISPLAY" => "ROW",
-//     "WIDTH" => 100
-//  ),
-
-
-
-// 'to' => 945,
-// 'MESSAGE' => 'Personal notification',
-// 'MESSAGE_OUT' => 'Personal notification text for email',
-// 'TAG' => 'TEST',
-// 'SUB_TAG' => 'SUB|TEST',
-// 'ATTACH' => ''
-//      )
-// Helper::notifySystem(945, "Hệ thống đã tự động đóng yêu cầu.", "Yêu cầu: Sửa mạng cho cơ sở 6", "Nhóm hỗ trợ IT", "18.08.2022 21:40");
 });
 
 Route::get("get-statistic-staff/{id_group}", [DashboardController::class, "get_statistic_staff"])->name("ticket.get-statistic-staff");

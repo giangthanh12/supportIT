@@ -1,4 +1,5 @@
 $(window).on('load', function () {
+
     return_combobox_multi('#group_id_shortcut',"/api/ticket/get-group", '');
     // Todo Description Editor
     if ($('#task-desc_shortcut').length) {
@@ -135,15 +136,22 @@ $(window).on('load', function () {
                 processData: false,
                 success: function (data) {
                     localStorage.setItem("msg", data.msg);
+                    localStorage.setItem("status", data.status);
                     window.location.replace("/my-ticket");
                 },
                 error: function(error) {
-                    console.log(error);
-                    toastr['error'](error.responseJSON.errors, 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                     });
+                    if(error.status == 422) {
+                        let responseHTML = "";
+                        $.each(error.responseJSON.errors, function (i, v) {
+                            $.each(v, function (i1, v1) {
+                                responseHTML += "<li>"+v1+"</li>"
+                            });
+                        });
+                         notify_error(responseHTML);
+                      }
+                      else {
+                        notify_error("Lỗi server");
+                      }
                 },
             });
             return false;

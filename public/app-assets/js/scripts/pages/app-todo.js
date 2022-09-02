@@ -118,11 +118,20 @@ $(function () {
 
   //notify when delete ticket
     if(localStorage.getItem("msg") != null) {
-        toastr['success'](localStorage.getItem("msg"), 'Success', {
-            tapToDismiss: false,
-            progressBar: true,
-            rtl: false
-         });
+        if(localStorage.getItem("status") != null) {
+            toastr[localStorage.getItem("status")](localStorage.getItem("msg"), localStorage.getItem("status"), {
+                tapToDismiss: false,
+                progressBar: true,
+                rtl: false
+             });
+             localStorage.removeItem("status");
+        } else {
+            toastr['success'](localStorage.getItem("msg"), 'Success', {
+                tapToDismiss: false,
+                progressBar: true,
+                rtl: false
+             });
+        }
         localStorage.removeItem("msg");
     }
 
@@ -355,19 +364,14 @@ $(function () {
     newTaskForm.validate({
       ignore: '.ql-container *', // ? ignoring quill editor icon click, that was creating console error
       rules: {
-        todoTitleAdd: {
-          required: true
-        },
-        'task-assigned': {
-          required: true
-        },
-        'task-due-date': {
-          required: true
-        }
+        // 'task-assigned': {
+        //   required: true
+        // },
       }
     });
 
     newTaskForm.on('submit', function (e) {
+
       e.preventDefault();
       var isValid = newTaskForm.valid();
       if (isValid) {
@@ -383,28 +387,27 @@ $(function () {
             contentType: false,
             processData: false,
             success: function (data) {
-                if(data.status == "success") {
-                    notyfi_success(data.msg);
-                }
-                else {
-                    toastr['warning'](data.msg, 'Warning', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        timeOut: 10000,
-                        rtl: false
-                     });
-                }
-
+                     if(data.status == "success") {
+                        notyfi_success(data.msg)
+                     } else {
+                        notyfi_warning(data.msg)
+                     }
                 get_list_ticket(level,status,time,group_id_filter);
                 newTaskModal.modal('hide');
             },
             error: function(error) {
-                console.log(error);
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+              if(error.status == 422) {
+                let responseHTML = "";
+                $.each(error.responseJSON.errors, function (i, v) {
+                    $.each(v, function (i1, v1) {
+                        responseHTML += "<li>"+v1+"</li>"
+                    });
+                });
+                 notify_error(responseHTML);
+              }
+              else {
+                notify_error("Lỗi server");
+              }
             },
         });
         return false;

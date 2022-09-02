@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\bitrix\CRest;
 use App\Http\Controllers\Controller;
 use App\Helper\Helper;
+use App\Http\Requests\ShortcutRequest;
+use App\Http\Requests\TicketRequest;
+use App\Http\Requests\updateAssigneeRequest;
 use App\Jobs\NotifyBitrix;
 use App\Models\Comment;
 use App\Models\Group;
@@ -21,9 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Str;
 use PHPUnit\TextUI\Help;
 use App\Traits\HistoryTrait;
+use App\Traits\ImageUploadTrait;
+use App\Traits\ResponseTrait;
+
 class TicketController extends Controller
 {
     use HistoryTrait;
+    use ResponseTrait;
+    use ImageUploadTrait;
     public function getGroup() {
         $groups = Group::select("id", "group_name as text")->get();
         return $groups;
@@ -66,37 +74,21 @@ class TicketController extends Controller
         $status = $request->has("status") ? $request->get("status") : "";
         return view("api.assign-ticket", compact("status"));
     }
-    public function save(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name_creator'=>'required',
-            'email_creator'=>'required',
-            'group_id'=>'required',
-            'ticket-level'=>'required',
-            'ticket-title'=>'required',
-            'content'=>'required',
-            "ticket-deadline"=>"required"
-        ]);
-        if($validator->fails()) {
-            return response()->json([
-                'errors'=>"Đã xảy ra lỗi validate trong quá trình tạo yêu cầu"
-            ],Response::HTTP_BAD_REQUEST);
-        }
+    public function save(TicketRequest $request) {
+
         $file_path = null;
-        if(!is_null($request->file('ticket_file'))) {
-            $file = pathinfo($request->file('ticket_file')->getClientOriginalName(), PATHINFO_FILENAME).rand(0,10).'.'.$request->file('ticket_file')->getClientOriginalExtension();
-            Storage::disk("public")->putFileAs("assets/file-ticket", $request->file('ticket_file'), $file);
-            $file_path = "storage/assets/file-ticket/".$file;
-        }
+        if(!is_null($request->file('ticket_file')))
+            $file_path = $this->upload_file($request->file('ticket_file'));
         $ticket = Ticket::create([
             "title"=>$request->input("ticket-title"),
             "creator_id"=>Auth::id(),
             "name_creator"=>$request->name_creator,
-            "deadline"=>Carbon::parse($request->input("ticket-deadline"))->format("Y-m-d H:i"),
-            "cc"=>!is_null($request->input("cc")) ? $request->input("cc") : NULL,
+            "deadline"=>$request->input("ticket-deadline"),
+            "cc"=>$request->input("cc"),
             "email_creator"=>$request->email_creator,
             "group_id"=>$request->group_id,
             "file"=>$file_path,
-            "assignees_id"=>is_null($request->input("task-assigned")) ? NULL : json_encode($request->input("task-assigned")),
+            "assignees_id"=>$request->input("task-assigned"),
             "content"=>$request->content,
             "level"=>$request->input("ticket-level"),
         ]);
@@ -113,46 +105,19 @@ class TicketController extends Controller
         // notify tất cả các thành viên trong nhóm có yêu cầu mới
         (new NotifyBitrix24())->sendAllMembers($ticket,auth()->user()->storeToken, $attribute);
         if(!Helper::checkTime(Carbon::parse($request->input('ticket-deadline')))) {
-            return response()->json([
-                "status"=>"warning",
-                'msg'=>"Lịch deadline không nằm trong lịch làm việc nhân viên. Vui lòng chỉnh sửa lại deadline cho phù hợp!"
-            ],Response::HTTP_CREATED);
+            $message = "Lịch deadline không nằm trong lịch làm việc nhân viên. Vui lòng chỉnh sửa lại deadline cho phù hợp!";
+            return $this->warningResponse($ticket, $message,201);
         }
-        return response()->json([
-            "status"=>"success",
-            'msg'=>"Đã tạo yêu cầu thành công"
-        ],Response::HTTP_CREATED);
+        return $this->successResponse($ticket,"Tạo yêu cầu thành công",201);
     }
     // get ticket by creator
     public function getdata(Request $request) {
         $tickets = Ticket::with("user:id,name,avatar")->select("id", "title", "level","status","creator_id","created_at")
-
-        ->when($request->has("level") && $request->level != "", function ($query) use($request) {
-            return $query->where("level", $request->level);
-        })
-        ->when($request->has("status") && $request->status != "", function ($query) use($request) {
-            if($request->status == 5)
-            return $query->whereIn("status", [3,4]);
-            return $query->where("status", $request->status);
-        })
-        ->when($request->has("time") && $request->time != "", function ($query) use($request) {
-            if($request->time == "today") {
-                return $query->whereDate('created_at', Carbon::today());
-            }
-            else if($request->time == "week") {
-                return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            } else if($request->time == "month")
-            {
-                return $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-            }
-        })
-        ->when($request->has("group_id") && $request->group_id != "", function ($query) use($request) {
-            return $query->where("group_id", $request->group_id);
-        })
-        ->where(function ($query) {
-            $query->where("creator_id", Auth::id())
-                  ->orWhere("cc",Auth::id());
-        })
+        ->OwnTicket()
+        ->ConditionLevel($request)
+        ->ConditionStatus($request)
+        ->ConditionTime($request)
+        ->ConditionGroup($request)
         ->orderBy("status", "ASC")
         ->orderBy("level", "ASC")
         ->orderBy("created_at", "DESC")->get();
@@ -164,25 +129,9 @@ class TicketController extends Controller
         $groups_id = Group::where("members_id", "like",'%'.$auth_id.'%')->pluck("id");
         $tickets = Ticket::with("user:id,name,avatar")->select("id", "title", "level","assignees_id","status","creator_id","created_at")
         ->whereIn('group_id', $groups_id)
-        ->when($request->has("level") && $request->level != "", function ($query) use($request) {
-            return $query->where("level", $request->level);
-        })
-        ->when($request->has("status") && $request->status != "", function ($query) use($request) {
-                 if($request->status == 5)
-            return $query->whereIn("status", [3,4]);
-            return $query->where("status", $request->status);
-        })
-        ->when($request->has("time") && $request->time != "", function ($query) use($request) {
-            if($request->time == "today") {
-                return $query->whereDate('created_at', Carbon::today());
-            }
-            else if($request->time == "week") {
-                return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            } else if($request->time == "month")
-            {
-                return $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-            }
-        })
+        ->ConditionLevel($request)
+        ->ConditionStatus($request)
+        ->ConditionTime($request)
         ->orderBy("status", "ASC")
         ->orderBy("level", "ASC")
         ->orderBy("created_at", "DESC")->get();
@@ -205,59 +154,35 @@ class TicketController extends Controller
     }
     public function getHistories($ticket_id) {
         $histories = History::with("user:id,name")->where("ticket_id", $ticket_id)->latest()->get();
-        return response()->json([
-            'data'=>$histories
-        ],Response::HTTP_OK);
+        return $this->successResponse($histories,"Lấy dữ liệu thành công",200);
     }
     public function getComments($id_ticket) {
         $comments = Comment::select("id","content", "count_like", "sender_id", "ticket_id", "updated_at as time_ago")->where("ticket_id", $id_ticket)->with("user:id,name,avatar")->get();
-        return response()->json([
-            'data'=>$comments
-        ],Response::HTTP_OK);
+        return $this->successResponse($comments,"Lấy dữ liệu thành công",200);
     }
 
-    public function update(Request $request, $id) {
+    public function update(TicketRequest $request, $id) {
         $ticket = Ticket::find($id);
         if($ticket->creator_id != Auth::id()) {
-            return response()->json([
-                'errors'=>"Bạn không có quyền sửa yêu cầu"
-            ],Response::HTTP_UNAUTHORIZED);
-        }
-        $validator = Validator::make($request->all(), [
-            'name_creator'=>'required',
-            'email_creator'=>'required',
-            'group_id'=>'required',
-            'ticket-level'=>'required',
-            'ticket-title'=>'required',
-            'ticket-deadline'=>'required',
-            'content'=>'required',
-        ]);
-        if($validator->fails()) {
-            return response()->json([
-                'errors'=>"Đã xảy ra lỗi validate trong quá trình tạo yêu cầu"
-            ],Response::HTTP_BAD_REQUEST);
+            return $this->errorResponse("Bạn không có quyền sửa yêu cầu",Response::HTTP_UNAUTHORIZED);
         }
         $file_path = !empty($request->ticket_file_old) ? $request->ticket_file_old : null;
-        if(!is_null($request->file('ticket_file'))) {
-            $file = pathinfo($request->file('ticket_file')->getClientOriginalName(), PATHINFO_FILENAME).rand(0,10).'.'.$request->file('ticket_file')->getClientOriginalExtension();
-            Storage::disk("public")->putFileAs("assets/file-ticket", $request->file('ticket_file'), $file);
-            $file_path = "storage/assets/file-ticket/".$file;
-        }
-        if(strtotime($request->input("ticket-deadline")) > strtotime($ticket->deadline)) {
-            $ticket->confirm_deadline = NULL;
-        }
-            $ticket->title=$request->input("ticket-title");
-            $ticket->creator_id=Auth::id();
-            $ticket->deadline = Carbon::parse($request->input("ticket-deadline"))->format("Y-m-d H:i");
-            $ticket->cc = !is_null($request->input("cc")) ? $request->input("cc") : NULL;
-            $ticket->name_creator=$request->name_creator;
-            $ticket->email_creator=$request->email_creator;
-            $ticket->group_id=$request->group_id;
-            $ticket->file=$file_path;
-            $ticket->assignees_id= !empty($request->input("task-assigned")) ? json_encode($request->input("task-assigned")) : NULL;
-            $ticket->content=$request->content;
-            $ticket->level=$request->input("ticket-level");
-            $ticket->save();
+        if(!is_null($request->file('ticket_file')))
+        $file_path = $this->upload_file($request->file('ticket_file'));
+        if(strtotime($request->input("ticket-deadline")) > strtotime($ticket->deadline))
+        $ticket->confirm_deadline = NULL;
+        $ticket->title=$request->input("ticket-title");
+        $ticket->creator_id=Auth::id();
+        $ticket->deadline = $request->input("ticket-deadline");
+        $ticket->cc = $request->input("cc");
+        $ticket->name_creator=$request->name_creator;
+        $ticket->email_creator=$request->email_creator;
+        $ticket->group_id=$request->group_id;
+        $ticket->file=$file_path;
+        $ticket->assignees_id = $request->input("task-assigned");
+        $ticket->content=$request->content;
+        $ticket->level=$request->input("ticket-level");
+        $ticket->save();
         // update histories
         $this->addHistory($ticket->id, "Đã cập nhật lại yêu cầu");
         // Chia làm 2 trường hợp
@@ -276,10 +201,7 @@ class TicketController extends Controller
         else {// Nếu yêu cầu đang xử lý thì chỉ notify những người liên quan và nhóm trưởng
             $NotifyBitrix24->sendLeaderAndRelatedMember($ticket, auth()->user()->storeToken, $attribute);
         }
-        return response()->json([
-            'msg'=>"Đã cập nhật yêu cầu thành công",
-            "data"=>$ticket
-        ],Response::HTTP_CREATED);
+        return $this->successResponse($ticket,"Cập nhật yêu cầu thành công",200);
     }
     public function confirm_ticket(Request $request) {
         $ticket = Ticket::find($request->ticket_id);
@@ -304,11 +226,10 @@ class TicketController extends Controller
         if(!is_null($ticket->cc) && !empty($ticket->cc) && auth()->user()->id != $ticket->cc) {
            $NotifyBitrix24->sendOneMember($ticket,auth()->user()->storeToken,$ticket->cc,$attribute);
         }
-        $NotifyBitrix24->sendOneMember($ticket,auth()->user()->storeToken,$ticket->creator_id,$attribute);
+        // $NotifyBitrix24->sendOneMember($ticket,auth()->user()->storeToken,$ticket->creator_id,$attribute);
         $NotifyBitrix24->sendLeaderAndRelatedMember($ticket, auth()->user()->storeToken, $attribute);
-        return response()->json([
-           'msg'=> $request->status_ticket == 2 ?"Đã hủy đóng yêu cầu" : "Đã xác nhận đóng yêu cầu",
-       ],Response::HTTP_OK);
+        $msg = $request->status_ticket == 2 ?"Đã hủy đóng yêu cầu" : "Đã xác nhận đóng yêu cầu";
+        return $this->successResponse($ticket,$msg,200);
       }
 
 
@@ -385,75 +306,19 @@ class TicketController extends Controller
                 $ticket->assignees_id = json_encode($assignees_id);
             }
             $ticket->save();
-            return response()->json([
-                'msg'=>"Cập nhật thành công",
-            ],Response::HTTP_OK);
+            return $this->successResponse($ticket,"Cập nhật thành công",200);
         }
-    // public function update_assignee(Request $request) {// Tiếp nhận yêu cầu
-    //     $ticket = Ticket::find($request->id_ticket);
-    //     $leader_id = Group::where("members_id", "like",'%'.'"'.Auth::id().'"'.'%')->first()->leader_id;
-    //     $notifyBitrix24 = new NotifyBitrix24();
-    //     $assignees_id = $ticket->assignees_id;
-
-    //     if(is_null($assignees_id) || empty($assignees_id)) {
-    //         $ticket->assignees_id = json_encode([(string) Auth::id()]);
-    //         $ticket->status = $ticket->status == 1 ? 2 : $ticket->status;
-    //         $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $ticket->creator_id, auth()->user()->name. " đã tiếp nhận yêu cầu");
-    //         if(Auth::id() != $leader_id)
-    //         $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $leader_id, auth()->user()->name. " trong nhóm của bạn đã tiếp nhận yêu cầu"); // thông báo cho leader
-    //     } else {
-    //         $assignees_id = json_decode($assignees_id);
-    //         if(in_array((string) Auth::id(), $assignees_id)) {
-    //             $key = array_search((string) Auth::id(), $assignees_id);
-    //             if($ticket->status == 1) {
-    //                 $ticket->status = 2;
-    //                 $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $ticket->creator_id, auth()->user()->name. " đã tiếp nhận yêu cầu");
-    //                 if(Auth::id() != $leader_id)
-    //                 $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $leader_id, auth()->user()->name. " trong nhóm của bạn đã tiếp nhận yêu cầu"); // thông báo cho leader
-    //             }
-    //             else {
-    //                 array_splice($assignees_id, $key, 1);
-    //                 $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $ticket->creator_id, auth()->user()->name. " đã hủy tiếp nhận yêu cầu");
-    //                 if(Auth::id() != $leader_id)
-    //                 $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $leader_id, auth()->user()->name. " trong nhóm của bạn đã hủy tiếp nhận yêu cầu"); // thông báo cho leader
-    //             }
-    //         }
-    //         else {
-    //             $assignees_id[] = (string) Auth::id();
-    //             $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $ticket->creator_id, auth()->user()->name. " đã tiếp nhận yêu cầu"); // thông báo cho người tạo yêu cầu
-    //             if(Auth::id() != $leader_id)
-    //             $notifyBitrix24->sendOneMember($ticket, auth()->user()->storeToken, $leader_id, auth()->user()->name. " trong nhóm của bạn đã tiếp nhận yêu cầu"); // thông báo cho leader
-    //             $ticket->status = 2;
-    //         }
-    //         $ticket->assignees_id = json_encode($assignees_id);
-    //     }
-    //     $ticket->save();
-    //     return response()->json([
-    //         'msg'=>"Cập nhật thành công",
-    //     ],Response::HTTP_OK);
-    // }
     public function check_permisiion_assign(Request $request) {
         $result = false;
         if(Helper::checkLeader(Auth::id()))
         $result = true;
-        return response()->json([
-            'data'=>$result,
-        ],Response::HTTP_OK);
+        return $this->successResponse($result,"Cập nhật thành công",200);
     }
-    public function update_assignee_ticket(Request $request) {
+    public function update_assignee_ticket(updateAssigneeRequest $request) {
         if(!Helper::checkLeader(Auth::id())) return false;
-        $validator = Validator::make($request->all(), [
-            'ticket-title'=>'required',
-            'task-assigned'=>'required|array',
-        ]);
-        if($validator->fails()) {
-            return response()->json([
-                'errors'=>"Đã xảy ra lỗi validate trong quá trình giao việc"
-            ],Response::HTTP_BAD_REQUEST);
-        }
         $ticket_id = $request->get("ticket-title");
         $ticket = Ticket::find($ticket_id);
-        $ticket->assignees_id = json_encode($request->get("task-assigned"));
+        $ticket->assignees_id = $request->get("task-assigned");
         $status_before = $ticket->status;
         $ticket->status = 2;
         $ticket->save();
@@ -478,21 +343,14 @@ class TicketController extends Controller
         if(!is_null($ticket->cc) && !empty($ticket->cc) && auth()->user()->id != $ticket->cc) {
             $notifyBitrix24->sendOneMember($ticket,auth()->user()->storeToken,$ticket->cc, $attribute);
         }
-        return response()->json([
-            'msg'=>"Phân công việc thành công!",
-        ],Response::HTTP_OK);
+        return $this->successResponse([],"Phân công công việc thành công!",200);
     }
     public function delete($id_ticket) {
         $ticket = Ticket::find($id_ticket);
-        if($ticket->creator_id != Auth::id()) {
-            return response()->json([
-                'errors'=>"Bạn không có quyền xóa yêu cầu"
-            ],Response::HTTP_UNAUTHORIZED);
-        }
+        if($ticket->creator_id != Auth::id())
+        return $this->errorResponse([],"Bạn không có quyền xóa yêu cầu!",401);
         $ticket->delete();
-        return response()->json([
-            'msg'=>"Đã xóa yêu cầu thành công",
-        ],Response::HTTP_OK);
+        return $this->successResponse([],"Đã xóa yêu cầu thành công!",200);
     }
     public function comment(Request $request) {
         $comment = Comment::create([
@@ -517,11 +375,7 @@ class TicketController extends Controller
         $dataResponse['comment_id'] = $comment->id;
         $dataResponse['content'] = $comment->content;
         $dataResponse['time_ago'] = $comment->created_at->diffForHumans();
-
-        return response()->json([
-            'msg'=>"Bình luận thành công",
-            "data"=>$dataResponse
-        ],Response::HTTP_CREATED);
+        return $this->successResponse($dataResponse,"Bình luận thành công!",201);
     }
     public function update_success($id_ticket) { // đóng tác vụ or mở tác vụ
         $ticket = Ticket::find($id_ticket);
@@ -540,9 +394,8 @@ class TicketController extends Controller
         if(!is_null($ticket->cc) && !empty($ticket->cc) && auth()->user()->id != $ticket->cc) {
             $notifyBitrix24->sendOneMember($ticket,auth()->user()->storeToken,$ticket->cc, $attribute);
         }
-        return response()->json([
-            'msg'=>$ticket->status == 3 ? "Đã chuyển trạng thái đã xử lý cho yêu cầu." : "Đã chuyển trạng đang xử lý cho yêu cầu.",
-        ],Response::HTTP_OK);
+        $msg = $ticket->status == 3 ? "Đã chuyển trạng thái đã xử lý cho yêu cầu." : "Đã chuyển trạng đang xử lý cho yêu cầu.";
+        return $this->successResponse([],$msg,200);
     }
     public function like_comment(Request $request) {
         $comment = Comment::find($request->comment_id);
@@ -565,48 +418,23 @@ class TicketController extends Controller
             ];
             (new NotifyBitrix24())->sendOneMember($ticket,auth()->user()->storeToken, $comment->sender_id, $attribute);
         }
-        return response()->json([
-            'msg'=>"Đã cập nhật trạng thái comment",
-            "data"=>$comment
-        ],Response::HTTP_OK);
+        return $this->successResponse([],"Đã cập nhật trạng thái comment",200);
     }
     public function update_comment(Request $request) {
         $comment = Comment::find($request->comment_id);
         $comment->content = $request->content_comment;
         $comment->save();
-        return response()->json([
-            'msg'=>"Đã cập nhật trạng thái comment",
-            "data"=>$comment
-        ],Response::HTTP_OK);
+        return $this->successResponse([],"Đã cập nhật trạng thái comment!",200);
     }
     public function delete_comment(Request $request) {
         $comment = Comment::find($request->comment_id);
         $comment->delete();
-        return response()->json([
-            'msg'=>"Đã xóa comment thành công",
-        ],Response::HTTP_OK);
+        return $this->successResponse([],"Đã xóa comment thành công!",200);
     }
-    public function save_shortcut(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'name_creator_shortcut'=>'required',
-            'email_creator_shortcut'=>'required',
-            'group_id_shortcut'=>'required',
-            'ticket-level_shortcut'=>'required',
-            'ticket-title_shortcut'=>'required',
-            'content_shortcut'=>'required',
-            "ticket-deadline_shortcut"=>"required"
-        ]);
-        if($validator->fails()) {
-            return response()->json([
-                'errors'=>"Đã xảy ra lỗi validate trong quá trình tạo yêu cầu"
-            ],Response::HTTP_BAD_REQUEST);
-        }
+    public function save_shortcut(ShortcutRequest $request) {
         $file_path = null;
-        if(!is_null($request->file('ticket_file_shortcut'))) {
-            $file = pathinfo($request->file('ticket_file_shortcut')->getClientOriginalName(), PATHINFO_FILENAME).rand(0,10).'.'.$request->file('ticket_file_shortcut')->getClientOriginalExtension();
-            Storage::disk("public")->putFileAs("assets/file-ticket", $request->file('ticket_file_shortcut'), $file);
-            $file_path = "storage/assets/file-ticket/".$file;
-        }
+        if(!is_null($request->file('ticket_file_shortcut')))
+            $file_path = $this->upload_file($request->file('ticket_file_shortcut'));
         $ticket = Ticket::create([
             "title"=>$request->input("ticket-title_shortcut"),
             "creator_id"=>Auth::id(),
@@ -633,14 +461,9 @@ class TicketController extends Controller
         // notify tất cả các thành viên trong nhóm có yêu cầu mới
         (new NotifyBitrix24())->sendAllMembers($ticket,auth()->user()->storeToken, $attribute);
         if(!Helper::checkTime(Carbon::parse($request->input('ticket-deadline_shortcut')))) {
-            return response()->json([
-                "status"=>"warning",
-                'msg'=>"Lịch deadline không nằm trong lịch làm việc nhân viên. Vui lòng chỉnh sửa lại deadline cho phù hợp!"
-            ],Response::HTTP_CREATED);
+            $message = "Lịch deadline không nằm trong lịch làm việc nhân viên. Vui lòng chỉnh sửa lại deadline cho phù hợp!";
+            return $this->warningResponse($ticket, $message,201);
         }
-        return response()->json([
-            "status"=>"success",
-            'msg'=>"Đã tạo yêu cầu thành công"
-        ],Response::HTTP_CREATED);
+        return $this->successResponse($ticket,"Tạo yêu cầu thành công",201);
     }
 }

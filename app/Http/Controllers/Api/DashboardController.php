@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Group;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Traits\ResponseTrait;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 class DashboardController extends Controller
 {
+    use ResponseTrait;
     public function index(Request $request) {
         $token = $request->has("token") ? $request->get("token") : null;
         $groups = Group::get(["id", "group_name"]);
@@ -48,19 +50,9 @@ class DashboardController extends Controller
             $total_tickets_notdone = Ticket::where("status", 2)->whereIn('group_id', $groups_id)->get()->count();
         }
           // via user
-          $total_new_tickets_user = Ticket::where(function ($query) {
-            $query->where("creator_id", Auth::id())
-                  ->orWhere("cc",Auth::id());
-        })
-        ->where("status", 1)->get()->count();
-        $total_tickets_done_user = Ticket::where(function ($query) {
-            $query->where("creator_id", Auth::id())
-                  ->orWhere("cc",Auth::id());
-        })->whereIn("status", [3,4])->get()->count();
-        $total_tickets_notdone_user = Ticket::where(function ($query) {
-            $query->where("creator_id", Auth::id())
-                  ->orWhere("cc",Auth::id());
-        })->where("status", 2)->get()->count();
+        $total_new_tickets_user = Ticket::OwnTicket()->where("status", 1)->get()->count();
+        $total_tickets_done_user = Ticket::OwnTicket()->whereIn("status", [3,4])->get()->count();
+        $total_tickets_notdone_user = Ticket::OwnTicket()->where("status", 2)->get()->count();
         $data["total_assign_tickets"] = $total_assign_tickets;
         $data["total_new_tickets"] = $total_new_tickets;
         $data["total_tickets_done"] = $total_tickets_done;
@@ -69,53 +61,18 @@ class DashboardController extends Controller
         $data["total_new_tickets_user"] = $total_new_tickets_user;
         $data["total_tickets_done_user"] = $total_tickets_done_user;
         $data["total_tickets_notdone_user"] = $total_tickets_notdone_user;
-        return response()->json([
-            'data'=>$data
-        ],Response::HTTP_OK);
+        return $this->successResponse($data,"Lấy dữ liệu thành công",200);
     }
     public function get_ticketNotDone( Request $request) {
         $group_tickets = Group::select("id","group_name","leader_id")->with("user:id,name,email")->withCount([
             'ticket as totalNotDone' => function ($query) use($request) {
-                $query->when($request->has("date"), function ($query) use($request) {
-                    if($request->date == "today") {
-                        return $query->whereDate('created_at', Carbon::today());
-                    }
-                    else if($request->date == "week") {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    } else if($request->date == "month")
-                    {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-                    }
-                })
-                ->where('status', 2);
+                $query->ConditionTime($request)->where('status', 2);
             },
             'ticket as totalDone' => function ($query) use($request) {
-                $query->when($request->has("date"), function ($query) use($request) {
-                    if($request->date == "today") {
-                        return $query->whereDate('created_at', Carbon::today());
-                    }
-                    else if($request->date == "week") {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    } else if($request->date == "month")
-                    {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-                    }
-                })
-                ->whereIn('status', [3,4]);
+                $query->ConditionTime($request)->whereIn('status', [3,4]);
             },
             'ticket as totalPending' => function ($query) use($request) {
-                $query->when($request->has("date"), function ($query) use($request) {
-                    if($request->date == "today") {
-                        return $query->whereDate('created_at', Carbon::today());
-                    }
-                    else if($request->date == "week") {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    } else if($request->date == "month")
-                    {
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-                    }
-                })
-                ->where('status', 1);
+                $query->ConditionTime($request)->where('status', 1);
             }
         ])->get();
         return $group_tickets;

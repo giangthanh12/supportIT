@@ -72,7 +72,9 @@
                                             class="form-control">
                                         <div class="text-danger">{{ $errors->first('title-holiday') }}</div>
                                     </div>
-                                    <div class="col-md-2" style="display: flex;align-items: end;">
+                                    <div class="col-md-2" style="display: flex;
+                                    align-items: flex-start;
+                                    margin-top: 20px;">
                                         <button type="submit"
                                             class="btn btn-primary waves-effect waves-float waves-light">{{ isset($holidayEdit) ? 'Update' : 'Add' }}</button>
                                     </div>
@@ -173,17 +175,19 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label for="from-calendar">Từ</label>
-                                        <input type="time" name="from-calendar" class="form-control" required
+                                        <input type="time" name="from-calendar" class="form-control"
                                             value="{{ old('from-calendar', isset($calendarEdit) ? $calendarEdit->from : '') }}">
                                         <div class="text-danger">{{ $errors->first('from-calendar') }}</div>
                                     </div>
                                     <div class="col-md-2">
                                         <label for="to-calendar">Đến</label>
-                                        <input type="time" name="to-calendar" class="form-control" required
+                                        <input type="time" name="to-calendar" class="form-control"
                                             value="{{ old('to-calendar', isset($calendarEdit) ? $calendarEdit->to : '') }}">
                                         <div class="text-danger">{{ $errors->first('to-calendar') }}</div>
                                     </div>
-                                    <div class="col-md-2" style="display: flex;align-items: end;">
+                                    <div class="col-md-2" style="display: flex;
+                                    align-items: flex-start;
+                                    margin-top: 20px;">
                                         <button type="submit"
                                             class="btn btn-primary waves-effect waves-float waves-light">{{ isset($calendarEdit) ? 'Update' : 'Add' }}</button>
                                     </div>
@@ -285,12 +289,8 @@
                     type: "POST",
                     url: "/settings/save-time",
                     data: { timeclose:timeclose, _token:_token},
-                    success: function( msg ) {
-                        toastr['success'](msg, '🎉 Success', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                        });
+                    success: function( data ) {
+                        notyfi_success(data.msg);
                     }
                 });
             });

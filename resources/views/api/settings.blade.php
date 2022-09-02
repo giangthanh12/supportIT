@@ -40,7 +40,7 @@
                                     <label for="time-close">Thời gian(giờ)</label>
                                     <input type="text" id="time-close" name="time-close" value="{{!empty($timeclose) ? $timeclose->cfg_value : ""}}" class="form-control" required>
                                 </div>
-                                <div class="col-md-2" style="display: flex;align-items: end;">
+                                <div class="col-md-2" style="display: flex;align-items: flex-start; margin-top:20px;">
                                     <button type="submit"
                                         class="btn btn-primary waves-effect waves-float waves-light" id="confirm-timeclose">Submit</button>
                                 </div>
@@ -71,7 +71,7 @@
                                             class="form-control">
                                         {{-- <div class="text-danger">{{ $errors->first('title-holiday') }}</div> --}}
                                     </div>
-                                    <div class="col-md-2" style="display: flex;align-items: end;">
+                                    <div class="col-md-2" style="display: flex;align-items: flex-start;margin-top: 20px;">
                                         <button type="submit"
                                             class="btn btn-primary waves-effect waves-float waves-light btn-holiday">Thêm</button>
                                     </div>
@@ -126,7 +126,8 @@
                                         <input type="time" name="to-calendar" id="to-calendar" class="form-control" required
                                             value="">
                                     </div>
-                                    <div class="col-md-2" style="display: flex;align-items: end;">
+                                    <div class="col-md-2" style="display: flex;align-items: flex-start;   margin-top: 20px;">
+
                                         <button type="submit"
                                             class="btn btn-primary waves-effect waves-float waves-light btn-calendar">Thêm</button>
                                     </div>

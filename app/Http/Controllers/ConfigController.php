@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CalendarSaveRequest;
+use App\Http\Requests\CalendarUpdateRequest;
+use App\Http\Requests\HolidayRequest;
 use App\Models\Calendar;
 use App\Models\Config;
 use App\Models\Holiday;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +16,7 @@ use Illuminate\Support\Facades\View;
 
 class ConfigController extends Controller
 {
+    use ResponseTrait;
     public function __construct()
     {
         $calendars = Calendar::all()
@@ -25,7 +30,6 @@ class ConfigController extends Controller
         View::share("timeclose", $timeclose);
     }
     public function index() {
-
         return view("settings");
     }
     public function saveTimeClose(Request $request) {
@@ -33,28 +37,9 @@ class ConfigController extends Controller
             ['cfg_key' => "timeclose"],
             ['cfg_value' => $request->timeclose]
         );
-        return "Time close update successfull";
+        return $this->successResponse([],"Cập nhập thời gian tự động đóng yêu cầu thành công!",200);
     }
-    public function saveCalendar(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'day-calendar' => 'required|unique:calendars,DAY',
-            'from-calendar' => 'required',
-            'to-calendar' => 'required',
-        ],
-        [
-            'day-calendar.required'  => '(*) Day calendar is required',
-            'day-calendar.unique'  => '(*) Day calendar exists',
-            'from-calendar.required'  => '(*) From calendar is required',
-            'to-calendar.required'  => '(*) To calendar is required',
-        ]);
-        if ($validator->fails()) {
-            $messageError = [
-                "msg"=> "Calendar update unsuccessful!",
-                "status"=>"fail"
-            ];
-             return redirect()
-             ->back()->with($messageError)->withErrors($validator)->withInput();
-        }
+    public function saveCalendar(CalendarSaveRequest $request) {
         $day = $request->input("day-calendar");
         $from = $request->input("from-calendar");
         $to = $request->input("to-calendar");
@@ -69,27 +54,8 @@ class ConfigController extends Controller
         $calendarEdit = Calendar::findOrFail($id);
         return view("settings", compact("calendarEdit"));
     }
-    public function updateCalendar(Request $request, $id) {
+    public function updateCalendar(CalendarUpdateRequest $request, $id) {
         $calendarEdit = Calendar::findOrFail($id);
-        $validator = Validator::make($request->all(), [
-            'day-calendar' => 'required|unique:calendars,DAY,'.$id,
-            'from-calendar' => 'required',
-            'to-calendar' => 'required',
-        ],
-        [
-            'day-calendar.required'  => '(*) Day calendar is required',
-            'day-calendar.unique'  => '(*) Day calendar exists',
-            'from-calendar.required'  => '(*) From calendar is required',
-            'to-calendar.required'  => '(*) To calendar is required',
-        ]);
-        if ($validator->fails()) {
-            $messageError = [
-                "msg"=> "Calendar update unsuccessful!",
-                "status"=>"fail"
-            ];
-             return redirect()
-             ->back()->with($messageError)->withErrors($validator)->withInput();
-        }
         $day = $request->input("day-calendar");
         $from = $request->input("from-calendar");
         $to = $request->input("to-calendar");
@@ -99,7 +65,7 @@ class ConfigController extends Controller
             "to"=>$to,
         ]);
         $messageSuccess = [
-            "msg"=> "Calendar update successful!",
+            "msg"=> "Cập nhập lịch làm việc thành công!",
             "status"=>"success"
         ];
         return redirect()->route("ticket.settings")->with($messageSuccess);
@@ -108,28 +74,12 @@ class ConfigController extends Controller
         $calendar = Calendar::findOrFail($id);
         $calendar->delete();
         $messageSuccess = [
-            "msg"=> "Calendar delete successful!",
+            "msg"=> "Xóa lịch làm việc thành công!",
             "status"=>"success"
         ];
         return back()->with($messageSuccess);
     }
-    public function saveHoliday(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'day-holiday' => 'required',
-            'title-holiday' => 'required',
-        ],
-        [
-            'day-holiday.required'  => '(*) Day holiday is required',
-            'title-holiday.required'  => '(*) Title holiday is required',
-        ]);
-        if ($validator->fails()) {
-            $messageError = [
-                "msg"=> "Holiday add unsuccessful!",
-                "status"=>"fail"
-            ];
-             return redirect()
-             ->back()->with($messageError)->withErrors($validator)->withInput();
-        }
+    public function saveHoliday(HolidayRequest $request) {
         $date = $request->input("day-holiday");
         $date = Carbon::parse($date)->format('Y-m-d');
         $title = $request->input("title-holiday");
@@ -138,7 +88,7 @@ class ConfigController extends Controller
             "title"=>$title,
         ]);
         $messageSuccess = [
-            "msg"=> "Holiday update successful!",
+            "msg"=> "Thêm ngày nghỉ thành công!",
             "status"=>"success"
         ];
         return back()->with($messageSuccess);
@@ -147,24 +97,8 @@ class ConfigController extends Controller
         $holidayEdit = Holiday::findOrFail($id);
         return view("settings", compact("holidayEdit"));
     }
-    public function updateHoliday(Request $request, $id) {
+    public function updateHoliday(HolidayRequest $request, $id) {
         $holiday = Holiday::findOrFail($id);
-        $validator = Validator::make($request->all(), [
-            'day-holiday' => 'required',
-            'title-holiday' => 'required',
-        ],
-        [
-            'day-holiday.required'  => '(*) Day holiday is required',
-            'title-holiday.required'  => '(*) Title holiday is required',
-        ]);
-        if ($validator->fails()) {
-            $messageError = [
-                "msg"=> "Holiday add unsuccessful!",
-                "status"=>"fail"
-            ];
-             return redirect()
-             ->back()->with($messageError)->withErrors($validator)->withInput();
-        }
         $date = $request->input("day-holiday");
         $date = Carbon::parse($date)->format('Y-m-d');
         $title = $request->input("title-holiday");
@@ -173,7 +107,7 @@ class ConfigController extends Controller
             "title"=>$title,
         ]);
         $messageSuccess = [
-            "msg"=> "Holiday update successful!",
+            "msg"=> "NGày nghỉ cập nhập thành công!",
             "status"=>"success"
         ];
         return redirect()->route("ticket.settings")->with($messageSuccess);
@@ -182,7 +116,7 @@ class ConfigController extends Controller
         $holiday = Holiday::findOrFail($id);
         $holiday->delete();
         $messageSuccess = [
-            "msg"=> "Holiday delete successful!",
+            "msg"=> "Xóa ngày nghỉ thành công!",
             "status"=>"success"
         ];
         return back()->with($messageSuccess);

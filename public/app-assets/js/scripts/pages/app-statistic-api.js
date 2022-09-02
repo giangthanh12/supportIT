@@ -208,6 +208,7 @@ $(function () {
         if(val.length > 0) {
             $("#filter-option").val("").change();
             $(".user-list-table").DataTable().ajax.url( '/api/statistic/getData?date='+val ).load();
+            notyfi_success("Cập nhập dữ liệu thành công!");
         }
     });
     $("#filter-option").change(function(e) {
@@ -218,6 +219,7 @@ $(function () {
             const from = array_date[0];
             const to = array_date[1];
             $(".user-list-table").DataTable().ajax.url(`/api/statistic/getData?from=${from}&to=${to}`).load();
+            notyfi_success("Cập nhập dữ liệu thành công!");
         }
         // $(".user-list-table").DataTable().ajax.url( '/statistic/getData?date='+val ).load();
     });

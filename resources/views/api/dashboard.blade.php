@@ -26,7 +26,7 @@
                                 <div class="text-center">
                                     <h1 class="mb-1 username-card"></h1>
                                     <p class="card-text m-auto w-75 total_assign_tickets">
-                                        Bạn đang có <strong>3</strong> yêu cầu cần xử lý trong hôm nay. Kiểm tra yêu cầu trong phần tiếp nhận yêu cầu <a href="{{route("api.assign-ticket")}}">tại đây</a>.
+                                        Bạn đang có <strong>0</strong> yêu cầu cần xử lý trong hôm nay. Kiểm tra yêu cầu trong phần tiếp nhận yêu cầu <a href="{{route("api.assign-ticket")}}">tại đây</a>.
                                     </p>
                                 </div>
                             </div>

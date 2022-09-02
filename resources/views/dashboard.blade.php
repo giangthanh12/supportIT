@@ -104,23 +104,23 @@
                                                 <h4 class="card-title">Danh sách yêu cầu</h4>
                                             </div>
                                         </div>
-                                        <div
+                                        {{-- <div
                                             class="col-sm-6 col-12 d-flex justify-content-between flex-column text-end order-sm-2 order-1">
                                             <div class="dropdown chart-dropdown">
-                                                {{-- <button class="btn btn-sm border-0 dropdown-toggle p-50" type="button"
+                                                <button class="btn btn-sm border-0 dropdown-toggle p-50" type="button"
                                                     id="dropdownItem5" data-bs-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">
                                                     Trong ngày
-                                                </button> --}}
-                                                {{-- <div class="dropdown-menu dropdown-menu-end date-group"
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end date-group"
                                                     aria-labelledby="dropdownItem5">
                                                     <a class="dropdown-item" data-date="today" href="#">Trong ngày</a>
                                                     <a class="dropdown-item" data-date="week">Trong tuần</a>
                                                     <a class="dropdown-item" data-date="month">Trong tháng</a>
-                                                </div> --}}
+                                                </div>
                                             </div>
                                             <div id="avg-sessions-chart"></div>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <hr />
                                     <div class="row avg-sessions pt-50">

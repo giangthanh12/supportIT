@@ -9,6 +9,7 @@
 ==========================================================================================*/
 var url = "";
 $(function () {
+    alert("ok4");
     if(emails_json.includes(localStorage.getItem("auth_email")))
           {
             $("#item-settings a").removeClass("d-none");
@@ -330,17 +331,14 @@ $(function () {
       var isValid = $("#form-holiday").valid();
       e.preventDefault();
       if (isValid) {
-        const title = $("#title-holiday").val();
-        const date = $("#day-holiday").val();
-        const holiday_id = $("#holiday_id").val();
+        var myform = new FormData($("#form-holiday")[0]);
         $.ajax({
             url: "/api/settings/holiday/save",
             type:"POST",
-            data:{
-                title,
-                date,
-                holiday_id
-              },
+            data:myform,
+            dataType: "json",
+            contentType: false,
+            processData: false,
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', 'Bearer '+localStorage.getItem("token"));
                 xhr.setRequestHeader('Accept', 'application/json');
@@ -348,11 +346,7 @@ $(function () {
             success:function(response){
               newUserSidebar.modal('hide');
               $(".user-list-table").DataTable().ajax.reload(null, false);
-              toastr['success'](response.msg, '🎉 Success', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-                });
+              notyfi_success(response.msg)
                 // reset data
                $("#title-holiday").val("");
                $("#day-holiday").val("");
@@ -360,11 +354,18 @@ $(function () {
                $(".btn-holiday").html("Thêm");
             },
             error: function(error) {
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
             });
       }
@@ -405,11 +406,7 @@ $(function () {
             },
             success:function(response){
               dtCalendarTable.DataTable().ajax.reload(null, false);
-              toastr['success'](response.msg, '🎉 Success', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-                });
+              notyfi_success(response.msg)
                 // reset data
                 $("#calendarId").val("");
                 $("#day-calendar").val("").change();
@@ -418,12 +415,18 @@ $(function () {
                 $(".btn-calendar").html("Thêm");
             },
             error: function(error) {
-                console.log(error);
-                toastr['error'](error.responseJSON.errors, 'Error', {
-                    tapToDismiss: false,
-                    progressBar: true,
-                    rtl: false
-                 });
+                if(error.status == 422) {
+                    let responseHTML = "";
+                    $.each(error.responseJSON.errors, function (i, v) {
+                        $.each(v, function (i1, v1) {
+                            responseHTML += "<li>"+v1+"</li>"
+                        });
+                    });
+                     notify_error(responseHTML);
+                  }
+                  else {
+                    notify_error("Lỗi server");
+                  }
             },
             });
       }
@@ -454,7 +457,6 @@ function loaddataHoliday(id) {
             xhr.setRequestHeader('Accept', 'application/json');
         },
         success: function (data) {
-            console.log(data.data);
             var validator = $("#form-holiday").validate(); // reset form
             validator.resetForm();
             $(".error").removeClass("error"); // loại bỏ validate
@@ -462,11 +464,7 @@ function loaddataHoliday(id) {
             $("#day-holiday").val(data.data.date_format);
         },
         error: function () {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-             });
+            notify_error("Lỗi server");
         },
     });
 }
@@ -483,7 +481,6 @@ function loaddataCalendar(id) {
             xhr.setRequestHeader('Accept', 'application/json');
         },
         success: function (data) {
-            console.log();
             var validator = $("#form-calendar").validate(); // reset form
             validator.resetForm();
             $(".error").removeClass("error"); // loại bỏ validate
@@ -492,11 +489,7 @@ function loaddataCalendar(id) {
             $("#to-calendar").val(data.data.to);
         },
         error: function () {
-            toastr['error'](error.responseJSON.errors, 'Error', {
-                tapToDismiss: false,
-                progressBar: true,
-                rtl: false
-             });
+            notify_error("Lỗi server");
         },
     });
 }
@@ -525,18 +518,10 @@ function delHoliday(id) {
                 dataType: "json",
                 success: function (response) {
                     $(".user-list-table").DataTable().ajax.reload(null, false);
-                    toastr['success'](response.msg, '🎉 Success', {
-                      tapToDismiss: false,
-                      progressBar: true,
-                      rtl: false
-                      });
+                    notyfi_success(response.msg);
                 },
                 error: function (error) {
-                    toastr['error'](error.responseJSON.errors, 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                     });
+                    notify_error("Lỗi server");
                 },
             });
         }
@@ -567,18 +552,10 @@ function delCalendar(id) {
                 dataType: "json",
                 success: function (response) {
                     $(".list-calendar").DataTable().ajax.reload(null, false);
-                    toastr['success'](response.msg, '🎉 Success', {
-                      tapToDismiss: false,
-                      progressBar: true,
-                      rtl: false
-                      });
+                    notyfi_success(response.msg);
                 },
                 error: function (error) {
-                    toastr['error'](error.responseJSON.errors, 'Error', {
-                        tapToDismiss: false,
-                        progressBar: true,
-                        rtl: false
-                     });
+                    notify_error("Lỗi server");
                 },
             });
         }
